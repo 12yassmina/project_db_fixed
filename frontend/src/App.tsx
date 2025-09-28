@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { TranslationProvider } from "@/hooks/useTranslation";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import TransportPage from "./pages/TransportPage";
 import RestaurantPage from "./pages/RestaurantPage";
@@ -32,6 +33,7 @@ import GuideProfilePage from "./pages/GuideProfilePage";
 import GuideLoginPage from "./pages/GuideLoginPage";
 import GuideDashboardPage from "./pages/GuideDashboardPage";
 import GuidesPage from "./pages/GuidesPage";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,9 +41,10 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <TranslationProvider>
-        <Toaster />
-        <Sonner />
+      <AuthProvider>
+        <TranslationProvider>
+          <Toaster />
+          <Sonner />
         <BrowserRouter
           future={{
             v7_startTransition: true,
@@ -72,6 +75,7 @@ const App = () => (
           <Route path="/volunteers" element={<VolunteersPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/cities" element={<CitiesPage />} />
           <Route path='/guide' element={<GuidesPage />} />
           <Route path="/guides" element={<GuidesPage />} />
@@ -84,7 +88,8 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         </BrowserRouter>
-      </TranslationProvider>
+        </TranslationProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

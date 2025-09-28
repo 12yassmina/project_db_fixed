@@ -1,15 +1,30 @@
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Globe, Menu, X, Utensils, Hotel, Car, Ticket, Calendar, Building, Landmark } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { 
+  Menu, 
+  X, 
+  Globe, 
+  Utensils, 
+  Hotel, 
+  Car, 
+  Calendar,
+  Landmark,
+  Ticket,
+  Building,
+  User,
+  LogOut
+} from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [clickedDropdown, setClickedDropdown] = useState<string | null>(null);
   const { language, setLanguage, t } = useTranslation();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const handleDropdownClick = (dropdown: string) => {
     if (clickedDropdown === dropdown) {
@@ -187,16 +202,42 @@ export const Header = () => {
             </div>
 
             {/* Auth */}
-            <Link to="/signin">
-              <Button variant="ghost" size="sm" className="hidden sm:flex">
-                {t("header.signin")}
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="hero" size="sm">
-                {t("header.signup")}
-              </Button>
-            </Link>
+            {isAuthenticated ? (
+              <div className="hidden sm:flex items-center gap-3">
+                <Link to="/profile" className="flex items-center gap-2 hover:opacity-80">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={user?.avatar} alt={user?.firstName} />
+                    <AvatarFallback className="bg-gradient-morocco text-white text-xs">
+                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium hidden md:block">
+                    {user?.firstName}
+                  </span>
+                </Link>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={logout}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center gap-3">
+                <Link to="/signin">
+                  <Button variant="ghost" size="sm">
+                    {t("header.signin")}
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="hero" size="sm">
+                    {t("header.signup")}
+                  </Button>
+                </Link>
+              </div>
+            )}
 
             {/* Mobile menu toggle */}
             <Button
@@ -212,10 +253,9 @@ export const Header = () => {
 
         {/* Mobile menu */}
         <div
-          className={cn(
-            "lg:hidden mt-4 overflow-hidden transition-all duration-300",
+          className={`lg:hidden mt-4 overflow-hidden transition-all duration-300 ${
             isMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-          )}
+          }`}
         >
           <nav className="flex flex-col space-y-3 pb-4">
             {/* Home Link */}
@@ -282,16 +322,48 @@ export const Header = () => {
             ))}
 
             <div className="flex flex-col space-y-2 pt-3 border-t border-border">
-              <Link to="/signin">
-                <Button variant="ghost" size="sm" className="justify-start w-full">
-                  {t("header.signin")}
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button variant="hero" size="sm" className="w-full">
-                  {t("header.signup")}
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm" className="justify-start w-full">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="w-6 h-6">
+                          <AvatarImage src={user?.avatar} alt={user?.firstName} />
+                          <AvatarFallback className="bg-gradient-morocco text-white text-xs">
+                            {user?.firstName?.[0]}{user?.lastName?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span>My Profile</span>
+                      </div>
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="justify-start w-full" 
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/signin">
+                    <Button variant="ghost" size="sm" className="justify-start w-full">
+                      {t("header.signin")}
+                    </Button>
+                  </Link>
+                  <Link to="/signup">
+                    <Button variant="hero" size="sm" className="w-full">
+                      {t("header.signup")}
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>

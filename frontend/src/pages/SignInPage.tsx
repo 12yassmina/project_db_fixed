@@ -1,21 +1,80 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Mail, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useAuth } from "@/contexts/AuthContext";
+import { 
+  Eye, 
+  EyeOff, 
+  Mail, 
+  Lock, 
+  UserCheck,
+  AlertCircle,
+  Loader2,
+  ArrowLeft
+} from "lucide-react";
 
 const SignInPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { t } = useTranslation();
+  const { login, isLoading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/profile';
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear errors when user starts typing
+    if (error) setError('');
+    if (success) setSuccess('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This will work once Supabase is connected
-    console.log("Sign in attempt:", { email, password });
+    setError('');
+    setSuccess('');
+
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    try {
+      const result = await login(formData.email, formData.password);
+      
+      if (result.success) {
+        setSuccess('Login successful! Redirecting...');
+        // Navigation will be handled by the useEffect above
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+    }
   };
 
   return (
@@ -45,6 +104,21 @@ const SignInPage = () => {
                   </p>
                 </div>
 
+                {/* Error/Success Messages */}
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                
+                {success && (
+                  <Alert className="border-green-200 bg-green-50 text-green-800">
+                    <UserCheck className="h-4 w-4" />
+                    <AlertDescription>{success}</AlertDescription>
+                  </Alert>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center space-x-2">
@@ -53,11 +127,13 @@ const SignInPage = () => {
                     </Label>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={formData.email}
+                      onChange={handleInputChange}
                       placeholder="Enter your email"
                       required
+                      disabled={isLoading}
                       className="w-full"
                     />
                   </div>
@@ -67,15 +143,27 @@ const SignInPage = () => {
                       <Lock className="w-4 h-4" />
                       <span>Password</span>
                     </Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      required
-                      className="w-full"
-                    />
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        placeholder="Enter your password"
+                        required
+                        disabled={isLoading}
+                        className="w-full pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        disabled={isLoading}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
@@ -84,8 +172,19 @@ const SignInPage = () => {
                     </Link>
                   </div>
 
-                  <Button type="submit" className="w-full bg-gradient-morocco text-white hover:opacity-90">
-                    Sign In
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-morocco text-white hover:opacity-90"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Signing In...
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
                   </Button>
                 </form>
 
@@ -100,7 +199,7 @@ const SignInPage = () => {
 
                 <div className="mt-6 pt-6 border-t border-border">
                   <p className="text-xs text-muted-foreground text-center">
-                    Authentication requires Supabase integration to be activated
+                    Secure authentication powered by JWT tokens
                   </p>
                 </div>
               </Card>
