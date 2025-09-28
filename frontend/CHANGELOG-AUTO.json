@@ -1,0 +1,9 @@
+{
+  "edits": [
+    "New folder/src/components/Footer.tsx",
+    "New folder/src/App.tsx",
+    "New folder/src/pages/Index.tsx",
+    "New folder/src/pages/SchedulePage.tsx"
+  ],
+  "note": "Removed Guide links from Footer, added Guide link to navbar/header if detected, replaced 'Lovable' text/icon with 'Marhba Bik', added scripts/download_images.sh to download real images from Unsplash."
+}
