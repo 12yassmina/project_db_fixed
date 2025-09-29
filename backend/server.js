@@ -22,7 +22,7 @@ app.use(limiter);
 // Read allowed origins from .env and split into an array
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:8080']; // fallback
+  : ['http://localhost:8080', 'http://localhost:8081']; // fallback
 
 const corsOptions = {
   origin: function(origin, callback) {
@@ -62,7 +62,10 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/hotels', require('./routes/hotelRoutes'));
 app.use('/api/restaurants', require('./routes/restaurantRoutes'));
+app.use('/api/rentals', require('./routes/rentalRoutes'));
 app.use('/api/car-rentals', require('./routes/carRentalRoutes'));
+app.use('/api/events', require('./routes/eventsRoutes'));
+app.use('/api', require('./routes/imageRoutes'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -141,7 +144,7 @@ app.use('*', (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server: Running on port ${PORT}`);

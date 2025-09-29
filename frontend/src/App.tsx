@@ -34,6 +34,7 @@ import GuideLoginPage from "./pages/GuideLoginPage";
 import GuideDashboardPage from "./pages/GuideDashboardPage";
 import GuidesPage from "./pages/GuidesPage";
 import ProfilePage from "./pages/ProfilePage";
+import ExternalServicesPage from "./pages/ExternalServicesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -76,6 +77,7 @@ const App = () => (
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/external-services" element={<ExternalServicesPage />} />
           <Route path="/cities" element={<CitiesPage />} />
           <Route path='/guide' element={<GuidesPage />} />
           <Route path="/guides" element={<GuidesPage />} />

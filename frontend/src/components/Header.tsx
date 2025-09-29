@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Menu, 
   X, 
   Globe, 
-  Utensils, 
-  Hotel, 
-  Car, 
   Calendar,
   Landmark,
   Ticket,
@@ -25,6 +22,7 @@ export const Header = () => {
   const [clickedDropdown, setClickedDropdown] = useState<string | null>(null);
   const { language, setLanguage, t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleDropdownClick = (dropdown: string) => {
     if (clickedDropdown === dropdown) {
@@ -46,11 +44,6 @@ export const Header = () => {
   const currentLangName = languages.find((lang) => lang.code === language)?.name || "English";
 
   // Mega menu groups
-  const group1 = [
-    { name: t("header.restaurants"), href: "/restaurant", icon: Utensils },
-    { name: t("header.hotels"), href: "/hotel", icon: Hotel },
-    { name: t("header.rentals"), href: "/rental", icon: Car },
-  ];
 
   const group2 = [
     
@@ -63,8 +56,18 @@ export const Header = () => {
   const priorityLinks = [
     { name: t("header.guide"), href: "/guide" },
     { name: t("header.news"), href: "/news" },
-    { name: t("header.emergency"), href: "/emergency" },
+    // emergency handled separately to add role-based routing
   ];
+
+  const handleEmergencyClick = () => {
+    const role = user?.role?.toLowerCase();
+    // Route with role as query param so EmergencyPage can customize UI by role
+    if (role) {
+      navigate(`/emergency?role=${encodeURIComponent(role)}`);
+    } else {
+      navigate('/emergency');
+    }
+  };
 
   const otherLinks = [
     { name: t("header.transport"), href: "/transport" },
@@ -128,35 +131,15 @@ export const Header = () => {
               )}
             </div>
 
-            {/* Group 1 Dropdown - Services */}
-            <div
-              className="relative"
-              onMouseEnter={() => !clickedDropdown && setOpenDropdown("group1")}
-              onMouseLeave={() => !clickedDropdown && setOpenDropdown(null)}
+            {/* External Services Link */}
+            <Link
+              to="/external-services"
+              className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"
             >
-              <button 
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium flex items-center"
-                onClick={() => handleDropdownClick("group1")}
-              >
-                {t("services")}
-              </button>
-              {(openDropdown === "group1" || clickedDropdown === "group1") && (
-                <div className="absolute top-full left-0 mt-2 grid grid-cols-3 gap-4 p-4 bg-card border border-border rounded-xl shadow-elegant min-w-[400px]">
-                  {group1.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className="flex items-center gap-3 hover:bg-muted p-2 rounded-lg transition"
-                    >
-                      <item.icon className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-medium">{item.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+              External Services
+            </Link>
 
-            {/* Priority Links */}
+            {/* Priority Links (excluding Emergency - custom button below) */}
             {priorityLinks.map((item) => (
               <Link
                 key={item.name}
@@ -166,6 +149,12 @@ export const Header = () => {
                 {item.name}
               </Link>
             ))}
+            <button
+              onClick={handleEmergencyClick}
+              className="text-red-600 hover:text-red-700 transition-colors duration-200 text-sm font-semibold"
+            >
+              {t("header.emergency")}
+            </button>
 
             {/* Other Links */}
             {otherLinks.map((item) => (
@@ -282,22 +271,16 @@ export const Header = () => {
               ))}
             </div>
 
-            {/* Group 1 - Services */}
-            <div>
-              <p className="px-4 pt-2 text-sm font-semibold">{t("services")}</p>
-              {group1.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="block px-6 py-2 text-sm text-foreground hover:text-primary hover:bg-muted rounded-lg"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
+            {/* External Services Link */}
+            <Link
+              to="/external-services"
+              className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium py-2 px-4 rounded-lg hover:bg-muted"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              External Services
+            </Link>
 
-            {/* Priority Links */}
+            {/* Priority Links (excluding Emergency) */}
             {priorityLinks.map((item) => (
               <Link
                 key={item.name}
@@ -308,6 +291,12 @@ export const Header = () => {
                 {item.name}
               </Link>
             ))}
+            <button
+              onClick={() => { handleEmergencyClick(); setIsMenuOpen(false); }}
+              className="text-left w-full text-red-600 hover:text-red-700 transition-colors duration-200 text-sm font-semibold py-2 px-4 rounded-lg hover:bg-red-50"
+            >
+              {t("header.emergency")}
+            </button>
 
             {/* Other Links */}
             {otherLinks.map((item) => (

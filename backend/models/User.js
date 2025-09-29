@@ -186,8 +186,9 @@ userSchema.virtual('isLocked').get(function() {
   return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
-// Index for performance
-userSchema.index({ email: 1 });
+// Indexes for performance
+// 'email' already has a unique index via the schema path definition (unique: true).
+// Avoid defining a second index on the same field to prevent duplicate index warnings.
 userSchema.index({ createdAt: -1 });
 userSchema.index({ role: 1 });
 

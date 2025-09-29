@@ -10,7 +10,7 @@ const mockHotels = [
     city: 'Casablanca',
     rating: 4.5,
     price: 120,
-    image: '/api/placeholder/300/200',
+    image: '/api/images/hotel',
     amenities: ['WiFi', 'Pool', 'Gym', 'Restaurant'],
     worldCupPackage: true
   },
@@ -20,7 +20,7 @@ const mockHotels = [
     city: 'Marrakech',
     rating: 4.8,
     price: 95,
-    image: '/api/placeholder/300/200',
+    image: '/api/images/hotel',
     amenities: ['WiFi', 'Spa', 'Restaurant', 'Garden'],
     worldCupPackage: true
   }
@@ -31,9 +31,34 @@ const mockHotels = [
 // @access  Public
 router.get('/', optionalAuth, (req, res) => {
   try {
-    const { city, minPrice, maxPrice, rating } = req.query;
+    const { city, minPrice, maxPrice, rating, checkIn, checkOut, guests } = req.query;
     
-    let filteredHotels = [...mockHotels];
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    // Enhanced mock hotels with proper images
+    const enhancedMockHotels = mockHotels.map(hotel => ({
+      ...hotel,
+      images: [
+        `${baseUrl}/api/images/hotel`,
+        `${baseUrl}/api/images/hotel/large`
+      ],
+      pricePerNight: hotel.price,
+      currency: 'USD',
+      availability: true,
+      roomTypes: [],
+      coordinates: { latitude: 33.5731, longitude: -7.5898 },
+      reviewScore: hotel.rating * 2,
+      reviewCount: Math.floor(Math.random() * 1000) + 100,
+      amenities: hotel.amenities || ['WiFi', 'Pool', 'Restaurant'],
+      worldCupFeatures: {
+        stadiumDistance: Math.random() * 20,
+        shuttleService: Math.random() > 0.5,
+        worldCupPackage: hotel.worldCupPackage || false,
+        matchViewingArea: Math.random() > 0.6
+      }
+    }));
+    
+    let filteredHotels = [...enhancedMockHotels];
     
     if (city) {
       filteredHotels = filteredHotels.filter(hotel => 
@@ -53,12 +78,12 @@ router.get('/', optionalAuth, (req, res) => {
       filteredHotels = filteredHotels.filter(hotel => hotel.rating >= parseFloat(rating));
     }
     
+    console.log('🏨 Backend API: Returning hotels with images:', filteredHotels.length);
+    
     res.json({
       success: true,
-      data: {
-        hotels: filteredHotels,
-        total: filteredHotels.length
-      }
+      data: filteredHotels,
+      status: 200
     });
   } catch (error) {
     console.error('Get hotels error:', error);
@@ -66,6 +91,54 @@ router.get('/', optionalAuth, (req, res) => {
       success: false,
       message: 'Server error while fetching hotels'
     });
+  }
+});
+
+// @route   GET /api/hotels/:id
+// @desc    Get hotel details (richer media)
+// @access  Public
+router.get('/:id', optionalAuth, (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const hotel = mockHotels.find(h => h.id === id);
+
+    if (!hotel) {
+      return res.status(404).json({ success: false, message: 'Hotel not found' });
+    }
+
+    const data = {
+      ...hotel,
+      images: [
+        `${baseUrl}/api/images/hotel`,
+        `${baseUrl}/api/images/hotel/large`,
+        `${baseUrl}/api/images/hotel?i=2`,
+        `${baseUrl}/api/images/hotel?i=3`,
+        `${baseUrl}/api/images/hotel?i=4`
+      ],
+      gallery: [
+        `${baseUrl}/api/images/hotel/large`,
+        `${baseUrl}/api/images/hotel?type=lobby`,
+        `${baseUrl}/api/images/hotel?type=room`,
+        `${baseUrl}/api/images/hotel?type=pool`
+      ],
+      pricePerNight: hotel.price,
+      currency: 'USD',
+      availability: true,
+      roomTypes: [
+        { id: 'std', name: 'Standard', pricePerNight: hotel.price, images: [`${baseUrl}/api/images/hotel`] },
+        { id: 'dlx', name: 'Deluxe', pricePerNight: hotel.price + 40, images: [`${baseUrl}/api/images/hotel/large`] }
+      ],
+      coordinates: { latitude: 33.5731, longitude: -7.5898 },
+      reviewScore: hotel.rating * 2,
+      reviewCount: Math.floor(Math.random() * 1000) + 100,
+      amenities: hotel.amenities || ['WiFi', 'Pool', 'Restaurant']
+    };
+
+    res.json({ success: true, data, status: 200 });
+  } catch (error) {
+    console.error('Get hotel details error:', error);
+    res.status(500).json({ success: false, message: 'Server error while fetching hotel details' });
   }
 });
 
