@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -23,6 +23,7 @@ export const Header = () => {
   const { language, setLanguage, t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleDropdownClick = (dropdown: string) => {
     if (clickedDropdown === dropdown) {
@@ -32,6 +33,27 @@ export const Header = () => {
       setClickedDropdown(dropdown);
       setOpenDropdown(dropdown);
     }
+  };
+
+  // Helper function to check if a link is active
+  const isActiveLink = (href: string) => {
+    if (href === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(href);
+  };
+
+  // Helper function to get active link classes
+  const getLinkClasses = (href: string, baseClasses: string = "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium") => {
+    const isActive = isActiveLink(href);
+    return isActive 
+      ? `${baseClasses} text-primary font-semibold border-b-2 border-primary pb-1`
+      : baseClasses;
+  };
+
+  // Helper function to check if any route in a group is active
+  const isGroupActive = (routes: string[]) => {
+    return routes.some(route => isActiveLink(route));
   };
 
   const languages = [
@@ -83,7 +105,7 @@ export const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse hover:opacity-90 transition-opacity">
             <div className="w-12 h-12 bg-gradient-morocco rounded-full flex items-center justify-center shadow-morocco">
-              <span className="text-2xl">⚽</span>
+              <span className="text-2xl"></span>
             </div>
             <div className="hidden md:block">
               <h1 className="text-xl font-bold bg-gradient-morocco bg-clip-text text-transparent">
@@ -98,7 +120,7 @@ export const Header = () => {
             {/* Home Link */}
             <Link
               to="/"
-              className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"
+              className={getLinkClasses("/")}
             >
               {t("header.home")}
             </Link>
@@ -110,7 +132,9 @@ export const Header = () => {
               onMouseLeave={() => !clickedDropdown && setOpenDropdown(null)}
             >
               <button 
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium flex items-center"
+                className={`${isGroupActive(["/stadiums", "/tickets", "/schedule", "/cities"]) 
+                  ? "text-primary font-semibold border-b-2 border-primary pb-1 transition-colors duration-200 text-sm font-medium" 
+                  : "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"} flex items-center`}
                 onClick={() => handleDropdownClick("group2")}
               >
                 {t("matches")}
@@ -134,7 +158,7 @@ export const Header = () => {
             {/* External Services Link */}
             <Link
               to="/external-services"
-              className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"
+              className={getLinkClasses("/external-services")}
             >
               External Services
             </Link>
@@ -144,14 +168,14 @@ export const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"
+                className={getLinkClasses(item.href)}
               >
                 {item.name}
               </Link>
             ))}
             <button
               onClick={handleEmergencyClick}
-              className="text-red-600 hover:text-red-700 transition-colors duration-200 text-sm font-semibold"
+              className={getLinkClasses("/emergency")}
             >
               {t("header.emergency")}
             </button>
@@ -161,7 +185,7 @@ export const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"
+                className={getLinkClasses(item.href)}
               >
                 {item.name}
               </Link>
@@ -250,7 +274,7 @@ export const Header = () => {
             {/* Home Link */}
             <Link
               to="/"
-              className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium py-2 px-4 rounded-lg hover:bg-muted"
+              className={`${getLinkClasses("/", "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
               onClick={() => setIsMenuOpen(false)}
             >
               {t("header.home")}
@@ -274,7 +298,7 @@ export const Header = () => {
             {/* External Services Link */}
             <Link
               to="/external-services"
-              className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium py-2 px-4 rounded-lg hover:bg-muted"
+              className={`${getLinkClasses("/external-services", "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
               onClick={() => setIsMenuOpen(false)}
             >
               External Services
@@ -285,7 +309,7 @@ export const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium py-2 px-4 rounded-lg hover:bg-muted"
+                className={`${getLinkClasses(item.href, "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
@@ -293,7 +317,7 @@ export const Header = () => {
             ))}
             <button
               onClick={() => { handleEmergencyClick(); setIsMenuOpen(false); }}
-              className="text-left w-full text-red-600 hover:text-red-700 transition-colors duration-200 text-sm font-semibold py-2 px-4 rounded-lg hover:bg-red-50"
+              className={`text-left w-full ${getLinkClasses("/emergency", "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
             >
               {t("header.emergency")}
             </button>
@@ -303,7 +327,7 @@ export const Header = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium py-2 px-4 rounded-lg hover:bg-muted"
+                className={`${getLinkClasses(item.href, "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}

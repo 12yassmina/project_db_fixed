@@ -27,8 +27,37 @@ import {
 import { Link } from "react-router-dom";
 
 const TransportPage = () => {
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const [activeLanguage, setActiveLanguage] = useState("en");
+  const [selectedCity, setSelectedCity] = useState("Casablanca");
+  const [selectedTransportType, setSelectedTransportType] = useState("all");
+
+  // Handle app downloads and transport bookings
+  const handleAppDownload = (appName: string) => {
+    const appUrls = {
+      'InDrive': 'https://play.google.com/store/apps/details?id=sinet.startup.inDriver',
+      'Yango': 'https://play.google.com/store/apps/details?id=ru.yandex.taxi',
+      'Careem': 'https://play.google.com/store/apps/details?id=com.careem.acma',
+      'Uber': 'https://play.google.com/store/apps/details?id=com.ubercab'
+    };
+    
+    window.open(appUrls[appName as keyof typeof appUrls] || '#', '_blank');
+  };
+
+  const handleTransportBooking = (transportType: string, city: string) => {
+    // In a real app, this would redirect to booking pages
+    alert(`Booking ${transportType} in ${city}. This would redirect to the booking system.`);
+  };
+
+  const handleCallTaxi = (taxiType: string) => {
+    const taxiNumbers = {
+      'Petit Taxi': '+212 5XX XX XX XX',
+      'Grand Taxi': '+212 6XX XX XX XX', 
+      'Hotel Taxis': '+212 5XX XX XX XX',
+      'Airport Taxis': '+212 5XX XX XX XX'
+    };
+    
+    const number = taxiNumbers[taxiType as keyof typeof taxiNumbers];
+    window.location.href = `tel:${number}`;
+  };
 
   const transportModes = [
     {
@@ -119,7 +148,7 @@ const TransportPage = () => {
               <div className="mb-6">
                 <Badge variant="secondary" className="mb-4 border-2 border-red-200 bg-white/80">
                   <Globe className="w-4 h-4 mr-2" />
-                  {languages.find(l => l.code === activeLanguage)?.greeting || "Welcome to Morocco"}
+                  Welcome to Morocco
                 </Badge>
               </div>
               
@@ -132,165 +161,13 @@ const TransportPage = () => {
                 From high-speed trains to free stadium shuttles, we've got your journey covered.
               </p>
               
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="hero" size="lg" className="bg-gradient-morocco text-white">
-                  <Route className="w-5 h-5 mr-2" />
-                  Plan Your Journey Now
-                </Button>
-                <Button variant="outline" size="lg">
-                  <Download className="w-5 h-5 mr-2" />
-                  Download Transport Guide PDF
-                </Button>
-                <Button variant="outline" size="lg">
-                  <MapPin className="w-5 h-5 mr-2" />
-                  Interactive Map
-                </Button>
-              </div>
             </div>
           </div>
         </section>
 
-        {/* Transport Modes */}
-        <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-foreground mb-6">
-                Transportation Modes
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Choose your perfect way to explore Morocco during the World Cup
-              </p>
-            </div>
 
-            <Tabs defaultValue="shuttle" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-12">
-                {transportModes.map((mode) => (
-                  <TabsTrigger key={mode.id} value={mode.id} className="flex items-center gap-2">
-                    <mode.icon className="w-4 h-4" />
-                    <span className="hidden sm:inline">{mode.title}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
 
-              {transportModes.map((mode) => (
-                <TabsContent key={mode.id} value={mode.id}>
-                  <Card className="relative overflow-hidden border-2 border-red-100">
-                    {/* Zellige-inspired border pattern */}
-                    <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-500 via-green-500 to-red-500" />
-                    
-                    <div className="p-8">
-                      <div className="grid lg:grid-cols-2 gap-8 items-center">
-                        <div className="space-y-6">
-                          <div className="flex items-center gap-4">
-                            <div className={`w-16 h-16 bg-gradient-to-br ${mode.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
-                              <mode.icon className="w-8 h-8 text-white" />
-                            </div>
-                            <div>
-                              <h3 className="text-2xl font-bold text-foreground">{mode.title}</h3>
-                              <p className="text-muted-foreground">{mode.subtitle}</p>
-                            </div>
-                          </div>
-                          
-                          <p className="text-lg text-muted-foreground leading-relaxed">
-                            {mode.description}
-                          </p>
-                          
-                          <div className="grid grid-cols-2 gap-4">
-                            {mode.features.map((feature, idx) => (
-                              <div key={idx} className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-green-500 rounded-full" />
-                                <span className="text-sm text-muted-foreground">{feature}</span>
-                              </div>
-                            ))}
-                          </div>
-                          
-                          <Button size="lg" className={`bg-gradient-to-r ${mode.gradient} text-white hover:opacity-90`}>
-                            {mode.cta}
-                          </Button>
-                        </div>
-                        
-                        <div className="relative">
-                          <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
-                            <mode.icon className="w-24 h-24 text-gray-400" />
-                          </div>
-                          {/* Decorative Amazigh pattern */}
-                          <div className="absolute -top-4 -right-4 w-8 h-8 text-red-500 opacity-20">
-                            ⵣ
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-        </section>
-
-        {/* Popular Routes */}
-        <section className="py-20 bg-gradient-to-br from-green-50 to-red-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-foreground mb-6">
-                Popular Routes
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Most requested routes between Morocco's World Cup host cities
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {popularRoutes.map((route, index) => (
-                <Card key={index} className="relative overflow-hidden border-2 border-green-100 hover:shadow-xl transition-all duration-300 group">
-                  {/* Zellige border */}
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-red-500" />
-                  
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
-                          <MapPin className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2 text-lg font-bold">
-                            <span>{route.from}</span>
-                            <span className="text-muted-foreground">→</span>
-                            <span>{route.to}</span>
-                          </div>
-                          <Badge variant="secondary" className="mt-1">
-                            {route.transport}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-green-600">{route.price}</div>
-                        <div className="text-sm text-muted-foreground">per person</div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{route.duration}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{route.frequency}</span>
-                      </div>
-                    </div>
-                    
-                    <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white hover:opacity-90">
-                      Book This Route
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Interactive Map Section */}
+        {/* Interactive Transport Map */}
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
@@ -298,61 +175,493 @@ const TransportPage = () => {
                 Interactive Transport Map
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Explore stadiums, transport hubs, and routes with our interactive map
+                Select your city to discover available transport options, apps, taxis, and tramways
               </p>
             </div>
 
+            {/* City Selector */}
+            <div className="flex flex-wrap justify-center gap-2 mb-12">
+              {["Casablanca", "Rabat", "Marrakech", "Fez", "Tangier", "Agadir"].map((city) => (
+                <Button
+                  key={city}
+                  variant={selectedCity === city ? "default" : "outline"}
+                  onClick={() => setSelectedCity(city)}
+                  className="mb-2"
+                >
+                  <MapPin className="w-4 h-4 mr-2" />
+                  {city}
+                </Button>
+              ))}
+            </div>
+
+            {/* Transport Type Filters */}
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              <Button
+                variant={selectedTransportType === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedTransportType("all")}
+              >
+                All Transport
+              </Button>
+              <Button
+                variant={selectedTransportType === "public" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedTransportType("public")}
+              >
+                <Bus className="w-4 h-4 mr-1" />
+                Public Transport
+              </Button>
+              <Button
+                variant={selectedTransportType === "apps" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedTransportType("apps")}
+              >
+                <Phone className="w-4 h-4 mr-1" />
+                Ride Apps
+              </Button>
+              <Button
+                variant={selectedTransportType === "taxi" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedTransportType("taxi")}
+              >
+                <Car className="w-4 h-4 mr-1" />
+                Taxis
+              </Button>
+            </div>
+
+            {/* Map Display */}
             <Card className="relative overflow-hidden border-2 border-red-100">
               <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-500 via-green-500 to-red-500" />
               
               <div className="p-8">
-                {/* Map Filters */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                  <Button
-                    variant={selectedFilter === "all" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedFilter("all")}
-                  >
-                    <Filter className="w-4 h-4 mr-2" />
-                    All Routes
-                  </Button>
-                  <Button
-                    variant={selectedFilter === "trains" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedFilter("trains")}
-                  >
-                    <Train className="w-4 h-4 mr-2" />
-                    Show Only Trains
-                  </Button>
-                  <Button
-                    variant={selectedFilter === "shuttles" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedFilter("shuttles")}
-                  >
-                    <Bus className="w-4 h-4 mr-2" />
-                    Stadium Shuttles
-                  </Button>
-                  <Button
-                    variant={selectedFilter === "walking" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedFilter("walking")}
-                  >
-                    <Users className="w-4 h-4 mr-2" />
-                    Walking Paths
-                  </Button>
-                </div>
-                
-                {/* Placeholder Map */}
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center relative">
-                  <div className="text-center">
-                    <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 text-lg">Interactive Map Coming Soon</p>
-                    <p className="text-gray-400 text-sm">Zoomable map with stadiums, transport hubs, and routes</p>
+                <div className="grid lg:grid-cols-3 gap-8">
+                  {/* Map Area */}
+                  <div className="lg:col-span-2">
+                    <div className="aspect-video bg-gradient-to-br from-blue-50 to-green-50 rounded-xl relative overflow-hidden border-2 border-green-200 shadow-lg">
+                      {/* Morocco Map Background */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative w-full h-full max-w-md max-h-80 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg border-4 border-gray-300 shadow-inner">
+                          {/* Morocco Map Shape with Google Maps style */}
+                          <div className="absolute inset-4 bg-gradient-to-br from-green-200 to-green-300 rounded-lg relative overflow-hidden">
+                            {/* Road Network Grid */}
+                            <div className="absolute inset-0">
+                              {/* Major highways - horizontal */}
+                              <div className="absolute top-1/4 left-0 w-full h-0.5 bg-yellow-400 opacity-70"></div>
+                              <div className="absolute top-1/2 left-0 w-full h-0.5 bg-yellow-400 opacity-70"></div>
+                              <div className="absolute top-3/4 left-0 w-full h-0.5 bg-yellow-400 opacity-70"></div>
+                              
+                              {/* Major highways - vertical */}
+                              <div className="absolute left-1/4 top-0 w-0.5 h-full bg-yellow-400 opacity-70"></div>
+                              <div className="absolute left-1/2 top-0 w-0.5 h-full bg-yellow-400 opacity-70"></div>
+                              <div className="absolute left-3/4 top-0 w-0.5 h-full bg-yellow-400 opacity-70"></div>
+                              
+                              {/* Secondary roads */}
+                              <div className="absolute top-1/3 left-0 w-full h-px bg-gray-400 opacity-40"></div>
+                              <div className="absolute top-2/3 left-0 w-full h-px bg-gray-400 opacity-40"></div>
+                              <div className="absolute left-1/3 top-0 w-px h-full bg-gray-400 opacity-40"></div>
+                              <div className="absolute left-2/3 top-0 w-px h-full bg-gray-400 opacity-40"></div>
+                            </div>
+                            
+                            {/* Atlas Mountains representation */}
+                            <div className="absolute top-1/3 left-1/4 w-1/2 h-1/4 bg-amber-200 opacity-40 rounded-full shadow-inner"></div>
+                            
+                            {/* Coastline - Google Maps style */}
+                            <div className="absolute top-0 left-0 w-full h-3 bg-blue-400 opacity-60 rounded-t-lg"></div>
+                            <div className="absolute bottom-0 left-0 w-3/4 h-3 bg-blue-400 opacity-60 rounded-bl-lg"></div>
+                            <div className="absolute left-0 top-0 w-3 h-3/4 bg-blue-400 opacity-60 rounded-tl-lg"></div>
+                            
+                            {/* Cities and Routes */}
+                            {selectedCity && (
+                              <>
+                                {/* TGV Route: Casablanca - Rabat */}
+                                {(selectedCity === "Casablanca" || selectedCity === "Rabat") && (
+                                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                                    <path
+                                      d="M 45% 60% Q 42% 52% 40% 45%"
+                                      stroke="#3B82F6"
+                                      strokeWidth="3"
+                                      fill="none"
+                                      strokeDasharray="5,5"
+                                      className="animate-pulse"
+                                    />
+                                    <text x="42%" y="52%" className="text-xs font-bold fill-blue-600">TGV</text>
+                                  </svg>
+                                )}
+                                
+                                {/* Highway Route: Casablanca - Marrakech */}
+                                {(selectedCity === "Casablanca" || selectedCity === "Marrakech") && (
+                                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                                    <path
+                                      d="M 45% 60% Q 40% 67% 35% 75%"
+                                      stroke="#EF4444"
+                                      strokeWidth="3"
+                                      fill="none"
+                                      strokeDasharray="8,4"
+                                      className="animate-pulse"
+                                    />
+                                    <text x="38%" y="70%" className="text-xs font-bold fill-red-600">A7</text>
+                                  </svg>
+                                )}
+                                
+                                {/* Train Route: Fez - Casablanca */}
+                                {(selectedCity === "Fez" || selectedCity === "Casablanca") && (
+                                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                                    <path
+                                      d="M 55% 35% Q 50% 47% 45% 60%"
+                                      stroke="#10B981"
+                                      strokeWidth="2"
+                                      fill="none"
+                                      strokeDasharray="6,3"
+                                    />
+                                    <text x="48%" y="48%" className="text-xs font-bold fill-green-600">Train</text>
+                                  </svg>
+                                )}
+                                
+                                {/* Highway Route: Tangier - Rabat */}
+                                {(selectedCity === "Tangier" || selectedCity === "Rabat") && (
+                                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                                    <path
+                                      d="M 45% 15% Q 42% 30% 40% 45%"
+                                      stroke="#F59E0B"
+                                      strokeWidth="2"
+                                      fill="none"
+                                      strokeDasharray="4,2"
+                                    />
+                                    <text x="40%" y="32%" className="text-xs font-bold fill-amber-600">A1</text>
+                                  </svg>
+                                )}
+                                
+                                {/* Highway Route: Marrakech - Agadir */}
+                                {(selectedCity === "Marrakech" || selectedCity === "Agadir") && (
+                                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                                    <path
+                                      d="M 35% 75% Q 30% 80% 25% 85%"
+                                      stroke="#8B5CF6"
+                                      strokeWidth="2"
+                                      fill="none"
+                                      strokeDasharray="5,3"
+                                    />
+                                    <text x="28%" y="82%" className="text-xs font-bold fill-purple-600">A8</text>
+                                  </svg>
+                                )}
+                                
+                                {/* Airport Routes */}
+                                {selectedTransportType === "all" && (
+                                  <>
+                                    {/* Airport symbols */}
+                                    <div className="absolute" style={{left: "43%", top: "58%"}}>
+                                      <div className="w-3 h-3 bg-gray-600 rounded-full flex items-center justify-center">
+                                        <span className="text-xs text-white">✈</span>
+                                      </div>
+                                    </div>
+                                    <div className="absolute" style={{left: "38%", top: "43%"}}>
+                                      <div className="w-3 h-3 bg-gray-600 rounded-full flex items-center justify-center">
+                                        <span className="text-xs text-white">✈</span>
+                                      </div>
+                                    </div>
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </div>
+                          
+                          {/* City Markers */}
+                          {[
+                            { name: "Casablanca", x: "45%", y: "60%", stadium: "Grand Stade Hassan II" },
+                            { name: "Rabat", x: "40%", y: "45%", stadium: "Prince Moulay Abdellah" },
+                            { name: "Marrakech", x: "35%", y: "75%", stadium: "Stade de Marrakech" },
+                            { name: "Fez", x: "55%", y: "35%", stadium: "Complexe Sportif de Fès" },
+                            { name: "Tangier", x: "45%", y: "15%", stadium: "Stade Ibn Batouta" },
+                            { name: "Agadir", x: "25%", y: "85%", stadium: "Stade Adrar" }
+                          ].map((city) => (
+                            <div key={city.name} className="absolute" style={{ left: city.x, top: city.y }}>
+                              {/* City Marker */}
+                              <div
+                                className={`w-6 h-6 rounded-full cursor-pointer transition-all duration-300 border-2 border-white shadow-lg ${
+                                  selectedCity === city.name 
+                                    ? "bg-red-500 scale-150 shadow-xl animate-pulse" 
+                                    : "bg-green-600 hover:scale-125 hover:bg-green-500"
+                                }`}
+                                onClick={() => setSelectedCity(city.name)}
+                              >
+                                {/* Stadium Icon */}
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                                </div>
+                              </div>
+                              
+                              {/* City Label */}
+                              <div className={`absolute -top-8 left-1/2 transform -translate-x-1/2 transition-all duration-300 ${
+                                selectedCity === city.name ? 'opacity-100' : 'opacity-0 hover:opacity-100'
+                              }`}>
+                                <div className="bg-white px-2 py-1 rounded-md shadow-lg border text-xs font-semibold text-center whitespace-nowrap">
+                                  <div className="text-green-700">{city.name}</div>
+                                  <div className="text-gray-500 text-xs">{city.stadium}</div>
+                                </div>
+                              </div>
+                              
+                              {/* Connection Lines for Selected City */}
+                              {selectedCity === city.name && (
+                                <div className="absolute top-1/2 left-1/2 w-20 h-20 border-2 border-red-300 rounded-full animate-ping opacity-30"></div>
+                              )}
+                            </div>
+                          ))}
+                          
+                          {/* Transport Routes */}
+                          {selectedCity === "Casablanca" && (
+                            <>
+                              <div className="absolute top-[45%] left-[40%] w-[5%] h-[15%] bg-blue-500 opacity-50 rounded-full transform rotate-45"></div>
+                              <div className="absolute top-[60%] left-[35%] w-[10%] h-[15%] bg-blue-500 opacity-50 rounded-full transform rotate-12"></div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Map Legend */}
+                      <div className="absolute bottom-4 left-4 bg-white/95 p-3 rounded-lg shadow-lg border">
+                        <div className="text-xs font-semibold mb-2">Legend</div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-green-600 rounded-full"></div>
+                            <span className="text-xs">Host Cities</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <span className="text-xs">Selected</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-0.5 bg-blue-500"></div>
+                            <span className="text-xs">TGV Route</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-0.5 bg-red-500"></div>
+                            <span className="text-xs">Highway</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-0.5 bg-green-500"></div>
+                            <span className="text-xs">Train</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-0.5 bg-yellow-400"></div>
+                            <span className="text-xs">Roads</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs">✈</span>
+                            <span className="text-xs">Airports</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Decorative Amazigh symbols */}
+                      <div className="absolute top-4 right-4 text-3xl text-red-500 opacity-30">ⵣ</div>
+                      <div className="absolute bottom-4 right-4 text-3xl text-green-500 opacity-30">ⴰ</div>
+                      
+                      {/* Morocco Flag Colors */}
+                      <div className="absolute top-2 left-2 w-8 h-6 bg-red-500 rounded-sm shadow-md"></div>
+                      <div className="absolute top-2 left-12 w-8 h-6 bg-green-500 rounded-sm shadow-md"></div>
+                    </div>
                   </div>
-                  
-                  {/* Decorative Amazigh symbols */}
-                  <div className="absolute top-4 left-4 text-2xl text-red-500 opacity-20">ⵣ</div>
-                  <div className="absolute bottom-4 right-4 text-2xl text-green-500 opacity-20">ⴰ</div>
+
+                  {/* Transport Options Panel */}
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+                        <MapPin className="w-6 h-6 text-red-500" />
+                        {selectedCity}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-6">
+                        {selectedCity === "Casablanca" && "Morocco's economic capital with extensive transport network"}
+                        {selectedCity === "Rabat" && "Capital city with modern public transport systems"}
+                        {selectedCity === "Marrakech" && "Tourist hub with traditional and modern transport"}
+                        {selectedCity === "Fez" && "Historic city with developing transport infrastructure"}
+                        {selectedCity === "Tangier" && "Gateway to Europe with ferry and rail connections"}
+                        {selectedCity === "Agadir" && "Coastal city with airport and bus connections"}
+                      </p>
+                    </div>
+
+                    {/* Transport Options Based on Selected City and Type */}
+                    {(selectedTransportType === "all" || selectedTransportType === "public") && (
+                      <div className="space-y-3">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <Bus className="w-4 h-4" />
+                          Public Transport
+                        </h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          {selectedCity === "Casablanca" && (
+                            <>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-blue-50" onClick={() => handleTransportBooking('TGV High-Speed Train', selectedCity)}>
+                                🚄 TGV Train
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-green-50" onClick={() => handleTransportBooking('Casa Tramway', selectedCity)}>
+                                🚊 Tramway
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-yellow-50" onClick={() => handleTransportBooking('City Buses', selectedCity)}>
+                                🚌 City Buses
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-red-50" onClick={() => handleTransportBooking('Stadium Shuttles', selectedCity)}>
+                                🚐 Stadium Shuttles
+                              </Button>
+                            </>
+                          )}
+                          {selectedCity === "Rabat" && (
+                            <>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-blue-50" onClick={() => handleTransportBooking('TGV Train', selectedCity)}>
+                                🚄 TGV Train
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-green-50" onClick={() => handleTransportBooking('Rabat-Salé Tramway', selectedCity)}>
+                                🚊 Tramway
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-purple-50" onClick={() => handleTransportBooking('Bus Rapid Transit', selectedCity)}>
+                                🚌 Bus Rapid Transit
+                              </Button>
+                            </>
+                          )}
+                          {selectedCity === "Marrakech" && (
+                            <>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-yellow-50" onClick={() => handleTransportBooking('City Buses', selectedCity)}>
+                                🚌 City Buses
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-orange-50" onClick={() => handleTransportBooking('Tourist Shuttles', selectedCity)}>
+                                🚐 Tourist Shuttles
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-amber-50" onClick={() => handleTransportBooking('Horse Carriages', selectedCity)}>
+                                🏇 Caleche
+                              </Button>
+                            </>
+                          )}
+                          {selectedCity === "Fez" && (
+                            <>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-blue-50" onClick={() => handleTransportBooking('Regional Trains', selectedCity)}>
+                                🚂 Regional Trains
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-yellow-50" onClick={() => handleTransportBooking('Local Buses', selectedCity)}>
+                                🚌 Local Buses
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-purple-50" onClick={() => handleTransportBooking('Medina Shuttles', selectedCity)}>
+                                🚐 Medina Shuttles
+                              </Button>
+                            </>
+                          )}
+                          {selectedCity === "Tangier" && (
+                            <>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-blue-50" onClick={() => handleTransportBooking('Train to Casablanca', selectedCity)}>
+                                🚂 Train
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-cyan-50" onClick={() => handleTransportBooking('Ferry Terminal', selectedCity)}>
+                                ⛴️ Ferry
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-yellow-50" onClick={() => handleTransportBooking('City Buses', selectedCity)}>
+                                🚌 City Buses
+                              </Button>
+                            </>
+                          )}
+                          {selectedCity === "Agadir" && (
+                            <>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-sky-50" onClick={() => handleTransportBooking('Airport Shuttles', selectedCity)}>
+                                ✈️ Airport Shuttles
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-yellow-50" onClick={() => handleTransportBooking('Local Buses', selectedCity)}>
+                                🚌 Local Buses
+                              </Button>
+                              <Button variant="outline" size="sm" className="justify-start hover:bg-teal-50" onClick={() => handleTransportBooking('Beach Shuttles', selectedCity)}>
+                                🚐 Beach Shuttles
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {(selectedTransportType === "all" || selectedTransportType === "apps") && (
+                      <div className="space-y-3">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <Phone className="w-4 h-4" />
+                          Ride-sharing Apps
+                        </h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="justify-start hover:bg-orange-50 hover:border-orange-300"
+                            onClick={() => handleAppDownload('InDrive')}
+                          >
+                            🚗 InDrive
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="justify-start hover:bg-yellow-50 hover:border-yellow-300"
+                            onClick={() => handleAppDownload('Yango')}
+                          >
+                            🚕 Yango
+                          </Button>
+                          {(selectedCity === "Casablanca" || selectedCity === "Rabat" || selectedCity === "Marrakech") && (
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="justify-start hover:bg-green-50 hover:border-green-300"
+                                onClick={() => handleAppDownload('Careem')}
+                              >
+                                🚙 Careem
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="justify-start hover:bg-gray-50 hover:border-gray-300"
+                                onClick={() => handleAppDownload('Uber')}
+                              >
+                                🚘 Uber
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {(selectedTransportType === "all" || selectedTransportType === "taxi") && (
+                      <div className="space-y-3">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <Car className="w-4 h-4" />
+                          Traditional Taxis
+                        </h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="justify-start hover:bg-yellow-50 hover:border-yellow-300"
+                            onClick={() => handleCallTaxi('Petit Taxi')}
+                          >
+                            🚕 Petit Taxi
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="justify-start hover:bg-blue-50 hover:border-blue-300"
+                            onClick={() => handleCallTaxi('Grand Taxi')}
+                          >
+                            🚐 Grand Taxi
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="justify-start hover:bg-purple-50 hover:border-purple-300"
+                            onClick={() => handleCallTaxi('Hotel Taxis')}
+                          >
+                            🏨 Hotel Taxis
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="justify-start hover:bg-green-50 hover:border-green-300"
+                            onClick={() => handleCallTaxi('Airport Taxis')}
+                          >
+                            ✈️ Airport Taxis
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </Card>
@@ -397,122 +706,7 @@ const TransportPage = () => {
           </div>
         </section>
 
-        {/* Accessibility & Support */}
-        <section className="py-20 bg-gradient-to-br from-red-50 to-green-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-foreground mb-6">
-                Accessibility & Support
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                We're here to help 24/7 with multilingual support and emergency transport
-              </p>
-            </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Multilingual Support */}
-              <Card className="p-8 text-center border-2 border-red-100">
-                <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-xl flex items-center justify-center mx-auto mb-6">
-                  <Globe className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">Multilingual Support</h3>
-                <p className="text-muted-foreground mb-6">
-                  Available in Arabic, Tamazight, French, English, and Spanish
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {languages.map((lang) => (
-                    <Badge key={lang.code} variant="outline" className="text-xs">
-                      {lang.name}
-                    </Badge>
-                  ))}
-                </div>
-              </Card>
-
-              {/* WhatsApp Help */}
-              <Card className="p-8 text-center border-2 border-green-100">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-6">
-                  <MessageCircle className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">WhatsApp Help</h3>
-                <p className="text-muted-foreground mb-6">
-                  Instant support via WhatsApp for quick transport questions
-                </p>
-                <Button className="bg-green-500 hover:bg-green-600 text-white">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Chat Now
-                </Button>
-              </Card>
-
-              {/* Emergency Transport */}
-              <Card className="p-8 text-center border-2 border-orange-100">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-6">
-                  <Shield className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">Emergency Transport</h3>
-                <p className="text-muted-foreground mb-6">
-                  Night buses, safe zones, and emergency transport services
-                </p>
-                <Link to="/emergency">
-                  <Button variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Emergency Info
-                  </Button>
-                </Link>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Call to Action */}
-        <section className="py-20 bg-gradient-to-r from-red-600 via-green-600 to-red-600 text-white">
-          <div className="container mx-auto px-4 text-center">
-            <div className="max-w-4xl mx-auto space-y-8">
-              {/* Amazigh decorative elements */}
-              <div className="flex justify-center gap-8 text-4xl opacity-30 mb-8">
-                <span>ⵣ</span>
-                <span>ⴰ</span>
-                <span>ⵎ</span>
-                <span>ⴰ</span>
-                <span>ⵣ</span>
-              </div>
-              
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Ready to Explore Morocco?
-              </h2>
-              
-              <p className="text-xl opacity-90 max-w-2xl mx-auto mb-8">
-                Join thousands of fans who trust our transport network. 
-                Plan your journey today and experience Morocco with confidence.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 font-bold">
-                  <Route className="w-5 h-5 mr-2" />
-                  Plan Your Journey Now
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-red-600">
-                  <Download className="w-5 h-5 mr-2" />
-                  Download Transport Guide PDF
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-green-600">
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Subscribe for Route Alerts
-                </Button>
-              </div>
-              
-              {/* Gamification Element */}
-              <div className="mt-12 p-6 bg-white/10 rounded-xl backdrop-blur-sm">
-                <h3 className="text-xl font-bold mb-4">🏆 Collect City Stamps!</h3>
-                <p className="opacity-90 mb-4">
-                  Visit all host cities and collect digital stamps in your travel passport!
-                </p>
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-red-600">
-                  Start Collecting
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <Footer />

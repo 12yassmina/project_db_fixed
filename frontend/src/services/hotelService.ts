@@ -45,6 +45,7 @@ export interface HotelSearchParams {
   filters?: {
     priceRange?: { min: number; max: number };
     rating?: number;
+    worldCupFeatures?: boolean;
   };
   sortBy?: 'price' | 'rating' | 'distance' | 'popularity';
   limit?: number;
@@ -72,7 +73,7 @@ export interface HotelBookingConfirmation {
 
 class HotelService extends BaseApiService {
   constructor() {
-    const backendUrl = import.meta.env.VITE_API_BASE || 'http://localhost:5001/api';
+    const backendUrl = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
     super(backendUrl, 'Hotel Service', { 'Content-Type': 'application/json' });
     console.log('🏨 Hotel Service: Using backend API at', backendUrl);
   }

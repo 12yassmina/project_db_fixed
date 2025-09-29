@@ -88,6 +88,15 @@ const EmergencyPage = () => {
     // Clear action after 3 seconds
     setTimeout(() => setEmergencyAction(null), 3000);
   };
+
+  const handleSOSEmergency = () => {
+    setEmergencyAction('🚨 SOS ACTIVATED - Calling Emergency Services...');
+    
+    // Call primary emergency number
+    window.location.href = `tel:${roleActions.primaryNumber}`;
+    
+    setTimeout(() => setEmergencyAction(null), 5000);
+  };
   
   const handleNearestHospital = () => {
     setEmergencyAction('Finding nearest hospital...');
@@ -295,6 +304,15 @@ const EmergencyPage = () => {
                 <Button 
                   variant="destructive" 
                   size="lg"
+                  onClick={handleSOSEmergency}
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold animate-pulse"
+                >
+                  <AlertTriangle className="w-5 h-5 mr-2" />
+                  🚨 SOS EMERGENCY 🚨
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg"
                   onClick={() => handleEmergencyCall(roleActions.primaryNumber, roleActions.primaryLabel)}
                 >
                   <Phone className="w-4 h-4 mr-2" />
@@ -322,6 +340,7 @@ const EmergencyPage = () => {
                         size="sm"
                         onClick={() => handleEmergencyCall(action.number, action.label)}
                       >
+                        <Phone className="w-3 h-3 mr-1" />
                         {action.label}
                       </Button>
                     ))}
@@ -456,7 +475,7 @@ const EmergencyPage = () => {
                           Call
                         </a>
                       </Button>
-                      <Button variant="outline" size="icon">
+                      <Button variant="outline" size="icon" onClick={() => window.open(`https://maps.google.com/?q=${hospital.name}`, '_blank')}>
                         <ExternalLink className="w-4 h-4" />
                       </Button>
                     </div>
