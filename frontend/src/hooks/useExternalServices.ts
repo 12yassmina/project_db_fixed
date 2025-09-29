@@ -11,42 +11,16 @@ import { ApiResponse } from '@/services/apiService';
 // Hotel Service Hooks
 
 export const useHotelSearch = (params: HotelSearchParams, enabled: boolean = true) => {
-  return useQuery({
+  return useQuery<ApiResponse<Hotel[]>, Error, Hotel[]>({
     queryKey: ['hotels', params],
     queryFn: async () => {
-      console.log('🏨 Direct API call with params:', params);
-      
-      // Direct API call to backend
-      const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:5001/api';
-      const searchParams = new URLSearchParams({
-        city: params.location.city || '',
-        checkIn: params.dateRange.checkIn,
-        checkOut: params.dateRange.checkOut,
-        guests: params.guests.toString(),
-        ...(params.filters?.priceRange?.min && { minPrice: params.filters.priceRange.min.toString() }),
-        ...(params.filters?.priceRange?.max && { maxPrice: params.filters.priceRange.max.toString() }),
-        ...(params.filters?.rating && { rating: params.filters.rating.toString() })
-      });
-
-      const response = await fetch(`${API_BASE}/hotels?${searchParams}`);
-      const result = await response.json();
-      
-      console.log('🏨 Direct API result:', result);
-      
-      if (result.success && result.data) {
-        return {
-          success: true,
-          data: result.data,
-          status: 200
-        };
-      }
-      
-      throw new Error('Failed to fetch hotels');
+      // Delegate to service (can use direct external API or backend based on env)
+      return hotelService.searchHotels(params);
     },
     enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
-    select: (data: { success: boolean; data: any[] }) => (data?.success ? data.data : [])
+    select: (data) => (data.success && Array.isArray(data.data) ? data.data : [])
   });
 };
 
@@ -100,40 +74,15 @@ export const useHotelBooking = () => {
 // Rental Service Hooks
 
 export const useRentalSearch = (params: RentalSearchParams, enabled: boolean = true) => {
-  return useQuery({
+  return useQuery<ApiResponse<Rental[]>, Error, Rental[]>({
     queryKey: ['rentals', 'search', params],
     queryFn: async () => {
-      console.log('🏠 Direct API call with params:', params);
-      
-      // Direct API call to backend
-      const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:5001/api';
-      const searchParams = new URLSearchParams({
-        city: params.location.city || '',
-        ...(params.minPrice && { minPrice: params.minPrice.toString() }),
-        ...(params.maxPrice && { maxPrice: params.maxPrice.toString() }),
-        ...(params.guests && { guests: params.guests.toString() }),
-        ...(params.propertyType && { propertyType: params.propertyType })
-      });
-
-      const response = await fetch(`${API_BASE}/rentals?${searchParams}`);
-      const result = await response.json();
-      
-      console.log('🏠 Direct API result:', result);
-      
-      if (result.success && result.data) {
-        return {
-          success: true,
-          data: result.data,
-          status: 200
-        };
-      }
-      
-      throw new Error('Failed to fetch rentals');
+      return rentalService.searchRentals(params);
     },
     enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
-    select: (data: { success: boolean; data: any[] }) => (data?.success ? data.data : [])
+    select: (data) => (data.success && Array.isArray(data.data) ? data.data : [])
   });
 };
 
@@ -186,38 +135,15 @@ export const useRentalBooking = () => {
 // Restaurant Service Hooks
 
 export const useRestaurantSearch = (params: RestaurantSearchParams, enabled: boolean = true) => {
-  return useQuery({
+  return useQuery<ApiResponse<Restaurant[]>, Error, Restaurant[]>({
     queryKey: ['restaurants', params],
     queryFn: async () => {
-      console.log('🍽️ Direct API call with params:', params);
-      
-      // Direct API call to backend
-      const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:5001/api';
-      const searchParams = new URLSearchParams({
-        city: params.location.city || '',
-        ...(params.cuisine && { cuisine: params.cuisine.join(',') }),
-        ...(params.rating && { rating: params.rating.toString() })
-      });
-
-      const response = await fetch(`${API_BASE}/restaurants?${searchParams}`);
-      const result = await response.json();
-      
-      console.log('🍽️ Direct API result:', result);
-      
-      if (result.success && result.data) {
-        return {
-          success: true,
-          data: result.data,
-          status: 200
-        };
-      }
-      
-      throw new Error('Failed to fetch restaurants');
+      return restaurantService.searchRestaurants(params);
     },
     enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
-    select: (data: { success: boolean; data: any[] }) => (data?.success ? data.data : [])
+    select: (data) => (data.success && Array.isArray(data.data) ? data.data : [])
   });
 };
 
