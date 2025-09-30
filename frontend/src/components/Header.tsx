@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Menu, 
   X, 
   Globe, 
-  Utensils, 
-  Hotel, 
-  Car, 
   Calendar,
   Landmark,
   Ticket,
@@ -25,6 +22,8 @@ export const Header = () => {
   const [clickedDropdown, setClickedDropdown] = useState<string | null>(null);
   const { language, setLanguage, t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleDropdownClick = (dropdown: string) => {
     if (clickedDropdown === dropdown) {
@@ -34,6 +33,27 @@ export const Header = () => {
       setClickedDropdown(dropdown);
       setOpenDropdown(dropdown);
     }
+  };
+
+  // Helper function to check if a link is active
+  const isActiveLink = (href: string) => {
+    if (href === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(href);
+  };
+
+  // Helper function to get active link classes
+  const getLinkClasses = (href: string, baseClasses: string = "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium") => {
+    const isActive = isActiveLink(href);
+    return isActive 
+      ? `${baseClasses} text-primary font-semibold border-b-2 border-primary pb-1`
+      : baseClasses;
+  };
+
+  // Helper function to check if any route in a group is active
+  const isGroupActive = (routes: string[]) => {
+    return routes.some(route => isActiveLink(route));
   };
 
   const languages = [
@@ -46,11 +66,6 @@ export const Header = () => {
   const currentLangName = languages.find((lang) => lang.code === language)?.name || "English";
 
   // Mega menu groups
-  const group1 = [
-    { name: t("header.restaurants"), href: "/restaurant", icon: Utensils },
-    { name: t("header.hotels"), href: "/hotel", icon: Hotel },
-    { name: t("header.rentals"), href: "/rental", icon: Car },
-  ];
 
   const group2 = [
     
@@ -63,8 +78,18 @@ export const Header = () => {
   const priorityLinks = [
     { name: t("header.guide"), href: "/guide" },
     { name: t("header.news"), href: "/news" },
-    { name: t("header.emergency"), href: "/emergency" },
+    // emergency handled separately to add role-based routing
   ];
+
+  const handleEmergencyClick = () => {
+    const role = user?.role?.toLowerCase();
+    // Route with role as query param so EmergencyPage can customize UI by role
+    if (role) {
+      navigate(`/emergency?role=${encodeURIComponent(role)}`);
+    } else {
+      navigate('/emergency');
+    }
+  };
 
   const otherLinks = [
     { name: t("header.transport"), href: "/transport" },
@@ -80,7 +105,7 @@ export const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse hover:opacity-90 transition-opacity">
             <div className="w-12 h-12 bg-gradient-morocco rounded-full flex items-center justify-center shadow-morocco">
-              <span className="text-2xl">⚽</span>
+              <span className="text-2xl"></span>
             </div>
             <div className="hidden md:block">
               <h1 className="text-xl font-bold bg-gradient-morocco bg-clip-text text-transparent">
@@ -95,7 +120,7 @@ export const Header = () => {
             {/* Home Link */}
             <Link
               to="/"
-              className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"
+              className={getLinkClasses("/")}
             >
               {t("header.home")}
             </Link>
@@ -107,7 +132,9 @@ export const Header = () => {
               onMouseLeave={() => !clickedDropdown && setOpenDropdown(null)}
             >
               <button 
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium flex items-center"
+                className={`${isGroupActive(["/stadiums", "/tickets", "/schedule", "/cities"]) 
+                  ? "text-primary font-semibold border-b-2 border-primary pb-1 transition-colors duration-200 text-sm font-medium" 
+                  : "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"} flex items-center`}
                 onClick={() => handleDropdownClick("group2")}
               >
                 {t("matches")}
@@ -128,51 +155,37 @@ export const Header = () => {
               )}
             </div>
 
-            {/* Group 1 Dropdown - Services */}
-            <div
-              className="relative"
-              onMouseEnter={() => !clickedDropdown && setOpenDropdown("group1")}
-              onMouseLeave={() => !clickedDropdown && setOpenDropdown(null)}
+            {/* External Services Link */}
+            <Link
+              to="/external-services"
+              className={getLinkClasses("/external-services")}
             >
-              <button 
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium flex items-center"
-                onClick={() => handleDropdownClick("group1")}
-              >
-                {t("services")}
-              </button>
-              {(openDropdown === "group1" || clickedDropdown === "group1") && (
-                <div className="absolute top-full left-0 mt-2 grid grid-cols-3 gap-4 p-4 bg-card border border-border rounded-xl shadow-elegant min-w-[400px]">
-                  {group1.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className="flex items-center gap-3 hover:bg-muted p-2 rounded-lg transition"
-                    >
-                      <item.icon className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-medium">{item.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+              External Services
+            </Link>
 
-            {/* Priority Links */}
+            {/* Priority Links (excluding Emergency - custom button below) */}
             {priorityLinks.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"
+                className={getLinkClasses(item.href)}
               >
                 {item.name}
               </Link>
             ))}
+            <button
+              onClick={handleEmergencyClick}
+              className={getLinkClasses("/emergency")}
+            >
+              {t("header.emergency")}
+            </button>
 
             {/* Other Links */}
             {otherLinks.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium"
+                className={getLinkClasses(item.href)}
               >
                 {item.name}
               </Link>
@@ -261,7 +274,7 @@ export const Header = () => {
             {/* Home Link */}
             <Link
               to="/"
-              className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium py-2 px-4 rounded-lg hover:bg-muted"
+              className={`${getLinkClasses("/", "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
               onClick={() => setIsMenuOpen(false)}
             >
               {t("header.home")}
@@ -282,39 +295,39 @@ export const Header = () => {
               ))}
             </div>
 
-            {/* Group 1 - Services */}
-            <div>
-              <p className="px-4 pt-2 text-sm font-semibold">{t("services")}</p>
-              {group1.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="block px-6 py-2 text-sm text-foreground hover:text-primary hover:bg-muted rounded-lg"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
+            {/* External Services Link */}
+            <Link
+              to="/external-services"
+              className={`${getLinkClasses("/external-services", "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              External Services
+            </Link>
 
-            {/* Priority Links */}
+            {/* Priority Links (excluding Emergency) */}
             {priorityLinks.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium py-2 px-4 rounded-lg hover:bg-muted"
+                className={`${getLinkClasses(item.href, "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
               </Link>
             ))}
+            <button
+              onClick={() => { handleEmergencyClick(); setIsMenuOpen(false); }}
+              className={`text-left w-full ${getLinkClasses("/emergency", "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
+            >
+              {t("header.emergency")}
+            </button>
 
             {/* Other Links */}
             {otherLinks.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium py-2 px-4 rounded-lg hover:bg-muted"
+                className={`${getLinkClasses(item.href, "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}

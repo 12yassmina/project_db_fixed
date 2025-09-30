@@ -28,12 +28,15 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import CitiesPage from "./pages/CitiesPage";
 import CityPage from "./pages/CityPage";
+import CulturalSpotsPage from "./pages/CulturalSpotsPage";
+import ItineraryPage from "./pages/ItineraryPage";
 import MapPage from "./pages/MapPage";
 import GuideProfilePage from "./pages/GuideProfilePage";
 import GuideLoginPage from "./pages/GuideLoginPage";
 import GuideDashboardPage from "./pages/GuideDashboardPage";
 import GuidesPage from "./pages/GuidesPage";
 import ProfilePage from "./pages/ProfilePage";
+import ExternalServicesPage from "./pages/ExternalServicesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -69,6 +72,7 @@ const App = () => (
           <Route path="/news" element={<NewsPage />} />
           <Route path="/stadiums" element={<StadiumsPage />} />
           <Route path="/stadiums/:id" element={<StadiumDetailPage />} />
+          <Route path="/stadiums/:id/tour" element={<StadiumDetailPage />} />
           
           <Route path="/schedule" element={<SchedulePage />} />
           <Route path="/tickets" element={<TicketsPage />} />
@@ -76,6 +80,7 @@ const App = () => (
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/external-services" element={<ExternalServicesPage />} />
           <Route path="/cities" element={<CitiesPage />} />
           <Route path='/guide' element={<GuidesPage />} />
           <Route path="/guides" element={<GuidesPage />} />
@@ -83,6 +88,8 @@ const App = () => (
           <Route path="/guide/dashboard" element={<GuideDashboardPage />} />
           <Route path="/guide/:guideId" element={<GuideProfilePage />} />
           <Route path="/city/:cityName" element={<CityPage />} />
+          <Route path="/city/:cityName/cultural-spots" element={<CulturalSpotsPage />} />
+          <Route path="/city/:cityName/itinerary" element={<ItineraryPage />} />
           <Route path="/map" element={<MapPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

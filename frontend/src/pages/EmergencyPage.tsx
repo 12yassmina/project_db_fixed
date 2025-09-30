@@ -1,8 +1,12 @@
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   Phone, 
   MessageCircle, 
@@ -15,10 +19,132 @@ import {
   Car,
   Users,
   Info,
-  ExternalLink
+  ExternalLink,
+  CheckCircle
 } from "lucide-react";
 
 const EmergencyPage = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const [emergencyAction, setEmergencyAction] = useState<string | null>(null);
+  
+  const userRole = searchParams.get('role') || user?.role?.toLowerCase() || 'fan';
+  
+  // Role-specific emergency numbers and actions
+  const getRoleSpecificActions = (role: string) => {
+    switch (role) {
+      case 'organizer':
+      case 'staff':
+        return {
+          primaryNumber: '+212 6XX XX XX XX',
+          primaryLabel: 'Operations Center',
+          secondaryActions: [
+            { label: 'Stadium Control', number: '+212 5XX XX XX XX' },
+            { label: 'Security Coordinator', number: '+212 6XX XX XX XX' },
+            { label: 'Medical Team Lead', number: '+212 6XX XX XX XX' }
+          ]
+        };
+      case 'medical':
+        return {
+          primaryNumber: '141',
+          primaryLabel: 'Medical Emergency',
+          secondaryActions: [
+            { label: 'Hospital Coordinator', number: '+212 522 48 20 20' },
+            { label: 'Ambulance Dispatch', number: '+212 6XX XX XX XX' },
+            { label: 'Medical Director', number: '+212 6XX XX XX XX' }
+          ]
+        };
+      case 'security':
+        return {
+          primaryNumber: '19',
+          primaryLabel: 'Security Command',
+          secondaryActions: [
+            { label: 'Stadium Security', number: '+212 6XX XX XX XX' },
+            { label: 'Police Coordinator', number: '+212 5XX XX XX XX' },
+            { label: 'Emergency Response', number: '+212 6XX XX XX XX' }
+          ]
+        };
+      default: // fan
+        return {
+          primaryNumber: '190',
+          primaryLabel: 'General Emergency',
+          secondaryActions: [
+            { label: 'Fan Support WhatsApp', number: '+212 6XX XX XX XX' },
+            { label: 'Tourist Police', number: '+212 5XX XX XX XX' },
+            { label: 'Embassy Contact', number: '+212 5XX XX XX XX' }
+          ]
+        };
+    }
+  };
+  
+  const roleActions = getRoleSpecificActions(userRole);
+  
+  const handleEmergencyCall = (number: string, label: string) => {
+    setEmergencyAction(`Calling ${label}...`);
+    // Open phone dialer
+    window.location.href = `tel:${number}`;
+    
+    // Clear action after 3 seconds
+    setTimeout(() => setEmergencyAction(null), 3000);
+  };
+
+  const handleSOSEmergency = () => {
+    setEmergencyAction('🚨 SOS ACTIVATED - Calling Emergency Services...');
+    
+    // Call primary emergency number
+    window.location.href = `tel:${roleActions.primaryNumber}`;
+    
+    setTimeout(() => setEmergencyAction(null), 5000);
+  };
+  
+  const handleNearestHospital = () => {
+    setEmergencyAction('Finding nearest hospital...');
+    // In a real app, this would use geolocation
+    setTimeout(() => {
+      setEmergencyAction('Redirecting to hospital location...');
+      // Simulate opening maps
+      window.open('https://maps.google.com/?q=hospital+near+me', '_blank');
+      setTimeout(() => setEmergencyAction(null), 2000);
+    }, 1000);
+  };
+  
+  const handleQuickAction = (action: string, index: number) => {
+    setEmergencyAction(`Executing: ${action}`);
+    
+    switch (index) {
+      case 0: // Call emergency immediately
+        handleEmergencyCall(roleActions.primaryNumber, roleActions.primaryLabel);
+        break;
+      case 1: // Send location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            const message = `Emergency location: https://maps.google.com/?q=${latitude},${longitude}`;
+            // In real app, send via SMS or WhatsApp
+            window.open(`https://wa.me/${roleActions.secondaryActions[0]?.number}?text=${encodeURIComponent(message)}`, '_blank');
+          });
+        }
+        break;
+      case 2: // Contact embassy
+        handleEmergencyCall('+212 5XX XX XX XX', 'Embassy');
+        break;
+      case 3: // Request medical escort
+        handleEmergencyCall('141', 'Medical Emergency');
+        break;
+    }
+    
+    setTimeout(() => setEmergencyAction(null), 3000);
+  };
+  
+  const handleRequestHelp = () => {
+    setEmergencyAction('Sending emergency alert...');
+    // In real app, this would send alerts to multiple services
+    setTimeout(() => {
+      setEmergencyAction('Emergency services notified!');
+      setTimeout(() => setEmergencyAction(null), 3000);
+    }, 2000);
+  };
   const emergencyServices = [
     {
       icon: Phone,
@@ -134,13 +260,33 @@ const EmergencyPage = () => {
       <Header />
       
       <main className="pt-20">
+        {/* Role-specific Alert */}
+        {userRole !== 'fan' && (
+          <Alert className="mx-4 mt-4 border-blue-200 bg-blue-50">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Staff Mode:</strong> You're viewing emergency options for {userRole}. 
+              Specialized contacts and procedures are available below.
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {/* Emergency Action Status */}
+        {emergencyAction && (
+          <Alert className="mx-4 mt-4 border-green-200 bg-green-50">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>
+              {emergencyAction}
+            </AlertDescription>
+          </Alert>
+        )}
         {/* Hero Section */}
         <section className="py-16 bg-gradient-to-b from-red-50 to-muted">
           <div className="container mx-auto px-4 text-center">
             <div className="space-y-6">
               <Badge variant="destructive" className="mb-4">
                 <AlertTriangle className="w-4 h-4 mr-2" />
-                Emergency & Safety
+                Emergency & Safety - {userRole.charAt(0).toUpperCase() + userRole.slice(1)} Mode
               </Badge>
               
               <h1 className="text-4xl md:text-5xl font-bold text-foreground">
@@ -148,19 +294,59 @@ const EmergencyPage = () => {
               </h1>
               
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Important information and emergency numbers you need to ensure your safety during Morocco World Cup 2030
+                {userRole === 'fan' 
+                  ? 'Important information and emergency numbers for fans during Morocco World Cup 2030'
+                  : `Specialized emergency procedures and contacts for ${userRole} personnel`
+                }
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="destructive" size="lg">
-                  <Phone className="w-4 h-4 mr-2" />
-                  Emergency Call Now
+                <Button 
+                  variant="destructive" 
+                  size="lg"
+                  onClick={handleSOSEmergency}
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold animate-pulse"
+                >
+                  <AlertTriangle className="w-5 h-5 mr-2" />
+                  🚨 SOS EMERGENCY 🚨
                 </Button>
-                <Button variant="outline" size="lg">
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={() => handleEmergencyCall(roleActions.primaryNumber, roleActions.primaryLabel)}
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Call {roleActions.primaryLabel}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={handleNearestHospital}
+                >
                   <MapPin className="w-4 h-4 mr-2" />
                   Nearest Hospital
                 </Button>
               </div>
+              
+              {/* Role-specific quick actions */}
+              {roleActions.secondaryActions.length > 0 && (
+                <div className="mt-6">
+                  <p className="text-sm text-muted-foreground mb-3">Quick Access:</p>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {roleActions.secondaryActions.map((action, index) => (
+                      <Button
+                        key={action.label}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEmergencyCall(action.number, action.label)}
+                      >
+                        <Phone className="w-3 h-3 mr-1" />
+                        {action.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -289,7 +475,7 @@ const EmergencyPage = () => {
                           Call
                         </a>
                       </Button>
-                      <Button variant="outline" size="icon">
+                      <Button variant="outline" size="icon" onClick={() => window.open(`https://maps.google.com/?q=${hospital.name}`, '_blank')}>
                         <ExternalLink className="w-4 h-4" />
                       </Button>
                     </div>
@@ -354,7 +540,11 @@ const EmergencyPage = () => {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
               {quickActions.map((action, index) => (
-                <Card key={action} className="p-4 text-center bg-card hover:shadow-elegant transition-all duration-300 group cursor-pointer">
+                <Card 
+                  key={action} 
+                  className="p-4 text-center bg-card hover:shadow-elegant transition-all duration-300 group cursor-pointer"
+                  onClick={() => handleQuickAction(action, index)}
+                >
                   <div className="space-y-3">
                     <div className="w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
                       <span className="font-bold">{index + 1}</span>
@@ -368,7 +558,11 @@ const EmergencyPage = () => {
             </div>
 
             <div className="text-center mt-8">
-              <Button variant="destructive" size="lg">
+              <Button 
+                variant="destructive" 
+                size="lg"
+                onClick={handleRequestHelp}
+              >
                 <HeartHandshake className="w-4 h-4 mr-2" />
                 Request Immediate Help
               </Button>

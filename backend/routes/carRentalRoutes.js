@@ -10,7 +10,7 @@ const mockCarRentals = [
     model: 'Toyota Corolla',
     category: 'Economy',
     pricePerDay: 35,
-    image: '/api/placeholder/300/200',
+    image: '/api/images/car',
     features: ['AC', 'GPS', 'Bluetooth'],
     available: true
   },
@@ -20,7 +20,7 @@ const mockCarRentals = [
     model: 'Mercedes C-Class',
     category: 'Luxury',
     pricePerDay: 85,
-    image: '/api/placeholder/300/200',
+    image: '/api/images/car',
     features: ['AC', 'GPS', 'Leather Seats', 'Premium Sound'],
     available: true
   }

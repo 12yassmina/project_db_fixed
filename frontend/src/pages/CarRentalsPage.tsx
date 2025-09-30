@@ -33,7 +33,7 @@ const CarRentalsPage = () => {
       fuelType: "Petrol",
       doors: 4,
       features: ["AC", "GPS", "Bluetooth"],
-      image: "/api/placeholder/300/200",
+      image: "http://localhost:5000/api/images/car",
       location: "Casablanca Airport"
     },
     {
@@ -49,7 +49,7 @@ const CarRentalsPage = () => {
       fuelType: "Diesel",
       doors: 5,
       features: ["4WD", "AC", "GPS"],
-      image: "/api/placeholder/300/200",
+      image: "http://localhost:5000/api/images/car",
       location: "Marrakech Center"
     }
   ];
