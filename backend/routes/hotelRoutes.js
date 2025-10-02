@@ -1,88 +1,54 @@
 const express = require('express');
 const router = express.Router();
 const { optionalAuth } = require('../middleware/auth');
-
-// Mock hotel data for development
-const mockHotels = [
-  {
-    id: 1,
-    name: 'Hotel Atlas Casablanca',
-    city: 'Casablanca',
-    rating: 4.5,
-    price: 120,
-    image: '/api/images/hotel',
-    amenities: ['WiFi', 'Pool', 'Gym', 'Restaurant'],
-    worldCupPackage: true
-  },
-  {
-    id: 2,
-    name: 'Riad Marrakech Palace',
-    city: 'Marrakech',
-    rating: 4.8,
-    price: 95,
-    image: '/api/images/hotel',
-    amenities: ['WiFi', 'Spa', 'Restaurant', 'Garden'],
-    worldCupPackage: true
-  }
-];
+const Hotel = require('../models/Hotel');
 
 // @route   GET /api/hotels
 // @desc    Get all hotels
 // @access  Public
-router.get('/', optionalAuth, (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
-    const { city, minPrice, maxPrice, rating, checkIn, checkOut, guests } = req.query;
+    const { city, minPrice, maxPrice, rating, checkIn, checkOut, guests, featured } = req.query;
     
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-
-    // Enhanced mock hotels with proper images
-    const enhancedMockHotels = mockHotels.map(hotel => ({
-      ...hotel,
-      images: [
-        `${baseUrl}/api/images/hotel`,
-        `${baseUrl}/api/images/hotel/large`
-      ],
-      pricePerNight: hotel.price,
-      currency: 'USD',
-      availability: true,
-      roomTypes: [],
-      coordinates: { latitude: 33.5731, longitude: -7.5898 },
-      reviewScore: hotel.rating * 2,
-      reviewCount: Math.floor(Math.random() * 1000) + 100,
-      amenities: hotel.amenities || ['WiFi', 'Pool', 'Restaurant'],
-      worldCupFeatures: {
-        stadiumDistance: Math.random() * 20,
-        shuttleService: Math.random() > 0.5,
-        worldCupPackage: hotel.worldCupPackage || false,
-        matchViewingArea: Math.random() > 0.6
-      }
-    }));
-    
-    let filteredHotels = [...enhancedMockHotels];
+    // Build query
+    let query = { availability: true };
     
     if (city) {
-      filteredHotels = filteredHotels.filter(hotel => 
-        hotel.city.toLowerCase().includes(city.toLowerCase())
-      );
+      query.city = new RegExp(city, 'i');
     }
     
-    if (minPrice) {
-      filteredHotels = filteredHotels.filter(hotel => hotel.price >= parseInt(minPrice));
-    }
-    
-    if (maxPrice) {
-      filteredHotels = filteredHotels.filter(hotel => hotel.price <= parseInt(maxPrice));
+    if (minPrice || maxPrice) {
+      query.pricePerNight = {};
+      if (minPrice) query.pricePerNight.$gte = parseInt(minPrice);
+      if (maxPrice) query.pricePerNight.$lte = parseInt(maxPrice);
     }
     
     if (rating) {
-      filteredHotels = filteredHotels.filter(hotel => hotel.rating >= parseFloat(rating));
+      query.rating = { $gte: parseFloat(rating) };
     }
     
-    console.log('🏨 Backend API: Returning hotels with images:', filteredHotels.length);
+    if (featured === 'true') {
+      query.featured = true;
+    }
+    
+    // Execute query with sorting
+    const hotels = await Hotel.find(query)
+      .sort({ featured: -1, rating: -1 })
+      .limit(50);
+    
+    // Transform data to match frontend expectations
+    const transformedHotels = hotels.map(hotel => {
+      const hotelObj = hotel.toObject();
+      // Ensure id field exists (some components expect id instead of _id)
+      hotelObj.id = hotelObj._id.toString();
+      return hotelObj;
+    });
+    
+    console.log('🏨 Backend API: Returning hotels from database:', transformedHotels.length);
     
     res.json({
       success: true,
-      data: filteredHotels,
+      data: transformedHotels,
       status: 200
     });
   } catch (error) {
@@ -95,47 +61,17 @@ router.get('/', optionalAuth, (req, res) => {
 });
 
 // @route   GET /api/hotels/:id
-// @desc    Get hotel details (richer media)
+// @desc    Get hotel details
 // @access  Public
-router.get('/:id', optionalAuth, (req, res) => {
+router.get('/:id', optionalAuth, async (req, res) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const hotel = mockHotels.find(h => h.id === id);
+    const hotel = await Hotel.findById(req.params.id);
 
     if (!hotel) {
       return res.status(404).json({ success: false, message: 'Hotel not found' });
     }
 
-    const data = {
-      ...hotel,
-      images: [
-        `${baseUrl}/api/images/hotel`,
-        `${baseUrl}/api/images/hotel/large`,
-        `${baseUrl}/api/images/hotel?i=2`,
-        `${baseUrl}/api/images/hotel?i=3`,
-        `${baseUrl}/api/images/hotel?i=4`
-      ],
-      gallery: [
-        `${baseUrl}/api/images/hotel/large`,
-        `${baseUrl}/api/images/hotel?type=lobby`,
-        `${baseUrl}/api/images/hotel?type=room`,
-        `${baseUrl}/api/images/hotel?type=pool`
-      ],
-      pricePerNight: hotel.price,
-      currency: 'USD',
-      availability: true,
-      roomTypes: [
-        { id: 'std', name: 'Standard', pricePerNight: hotel.price, images: [`${baseUrl}/api/images/hotel`] },
-        { id: 'dlx', name: 'Deluxe', pricePerNight: hotel.price + 40, images: [`${baseUrl}/api/images/hotel/large`] }
-      ],
-      coordinates: { latitude: 33.5731, longitude: -7.5898 },
-      reviewScore: hotel.rating * 2,
-      reviewCount: Math.floor(Math.random() * 1000) + 100,
-      amenities: hotel.amenities || ['WiFi', 'Pool', 'Restaurant']
-    };
-
-    res.json({ success: true, data, status: 200 });
+    res.json({ success: true, data: hotel, status: 200 });
   } catch (error) {
     console.error('Get hotel details error:', error);
     res.status(500).json({ success: false, message: 'Server error while fetching hotel details' });

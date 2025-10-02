@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/contexts/AuthContext";
+import moroccoLogo from "@/assets/logoworld.png";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -95,17 +96,22 @@ export const Header = () => {
     { name: t("header.transport"), href: "/transport" },
     { name: t("header.events"), href: "/events" },
     { name: t("header.volunteers"), href: "/volunteers" },
-    { name: "Carte", href: "/map" },
+    { name: "Map", href: "/map" },
+    { name: t("header.emergency"), href: "/emergency", isButton: true },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-[1100] bg-card/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse hover:opacity-90 transition-opacity">
-            <div className="w-12 h-12 bg-gradient-morocco rounded-full flex items-center justify-center shadow-morocco">
-              <span className="text-2xl"></span>
+            <div className="w-16 h-16 rounded-full overflow-hidden">
+              <img 
+                src={moroccoLogo} 
+                alt="Morocco 2030 World Cup Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="hidden md:block">
               <h1 className="text-xl font-bold bg-gradient-morocco bg-clip-text text-transparent">
@@ -140,7 +146,7 @@ export const Header = () => {
                 {t("matches")}
               </button>
               {(openDropdown === "group2" || clickedDropdown === "group2") && (
-                <div className="absolute top-full left-0 mt-2 grid grid-cols-2 gap-4 p-4 bg-card border border-border rounded-xl shadow-elegant min-w-[400px]">
+                <div className="absolute top-full left-0 mt-2 grid grid-cols-2 gap-4 p-4 bg-card border border-border rounded-xl shadow-elegant min-w-[400px] z-[1200]">
                   {group2.map((item) => (
                     <Link
                       key={item.name}
@@ -163,7 +169,7 @@ export const Header = () => {
               External Services
             </Link>
 
-            {/* Priority Links (excluding Emergency - custom button below) */}
+            {/* Priority Links */}
             {priorityLinks.map((item) => (
               <Link
                 key={item.name}
@@ -173,22 +179,26 @@ export const Header = () => {
                 {item.name}
               </Link>
             ))}
-            <button
-              onClick={handleEmergencyClick}
-              className={getLinkClasses("/emergency")}
-            >
-              {t("header.emergency")}
-            </button>
 
             {/* Other Links */}
             {otherLinks.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={getLinkClasses(item.href)}
-              >
-                {item.name}
-              </Link>
+              item.isButton ? (
+                <button
+                  key={item.name}
+                  onClick={handleEmergencyClick}
+                  className={getLinkClasses(item.href)}
+                >
+                  {item.name}
+                </button>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={getLinkClasses(item.href)}
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
           </nav>
 
@@ -200,7 +210,7 @@ export const Header = () => {
                 <Globe className="w-4 h-4" />
                 <span className="hidden sm:inline">{currentLangName}</span>
               </Button>
-              <div className="absolute top-full right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-elegant opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+              <div className="absolute top-full right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-elegant opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[1200]">
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
@@ -304,7 +314,7 @@ export const Header = () => {
               External Services
             </Link>
 
-            {/* Priority Links (excluding Emergency) */}
+            {/* Priority Links */}
             {priorityLinks.map((item) => (
               <Link
                 key={item.name}
@@ -315,23 +325,27 @@ export const Header = () => {
                 {item.name}
               </Link>
             ))}
-            <button
-              onClick={() => { handleEmergencyClick(); setIsMenuOpen(false); }}
-              className={`text-left w-full ${getLinkClasses("/emergency", "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
-            >
-              {t("header.emergency")}
-            </button>
 
             {/* Other Links */}
             {otherLinks.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`${getLinkClasses(item.href, "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
+              item.isButton ? (
+                <button
+                  key={item.name}
+                  onClick={() => { handleEmergencyClick(); setIsMenuOpen(false); }}
+                  className={`text-left w-full ${getLinkClasses(item.href, "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
+                >
+                  {item.name}
+                </button>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`${getLinkClasses(item.href, "text-foreground hover:text-primary transition-colors duration-200 text-sm font-medium")} py-2 px-4 rounded-lg hover:bg-muted`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
 
             <div className="flex flex-col space-y-2 pt-3 border-t border-border">

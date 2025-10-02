@@ -19,7 +19,7 @@ export interface NewsArticle {
   likes?: number;
 }
 
-export type NewsCategory = 'Breaking' | 'Teams' | 'Matches'  'Stadiums';
+export type NewsCategory = 'Breaking' | 'Teams' | 'Matches' |  'Stadiums';
 
 export interface NewsSearchParams {
   category?: NewsCategory | 'All';
@@ -279,7 +279,7 @@ class NewsService extends ApiService {
         id: '3',
         title: 'World Cup 2030 Ticket Sales Phase 3 Opens',
         summary: 'Final phase of ticket sales begins with special pricing for Moroccan fans and exclusive World Cup match packages.',
-       
+        category: 'Tickets',
         publishedDate: '2024-12-18T14:30:00Z',
         author: 'FIFA Ticketing Division',
         readTime: '3 min read',

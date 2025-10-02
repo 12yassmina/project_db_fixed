@@ -137,6 +137,7 @@ export interface ApiResponse<T> {
   data?: T;
   error?: ApiError;
   status: number;
+  message?: string;
 }
 
 export interface ApiError {
@@ -220,6 +221,61 @@ export class ApiUtils {
       return `${corsProxy}${url}`;
     }
     return url;
+  }
+}
+
+/**
+ * Simple API Service for database operations
+ */
+export class ApiService {
+  protected baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+    try {
+      const url = `${this.baseUrl}${endpoint}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+        ...options,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          status: response.status,
+          error: {
+            service: 'API Service',
+            message: data.message || 'Request failed',
+            status: response.status
+          }
+        };
+      }
+
+      return {
+        success: true,
+        data: data.data || data,
+        status: response.status,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: 500,
+        error: {
+          service: 'API Service',
+          message: error instanceof Error ? error.message : 'Network error',
+          status: 500
+        }
+      };
+    }
   }
 }
 

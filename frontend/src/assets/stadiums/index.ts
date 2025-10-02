@@ -16,7 +16,9 @@ export type StadiumId =
   | "grand-stade-tanger"
   | "grand-stade-marrakesh"
   | "new-stadium-casablanca"
-  | "grand-stade-rabat";
+  | "grand-stade-rabat"
+  | "stade-de-fes"
+  | "stade-adrar-agadir";
 
 export interface StadiumMeta {
   id: StadiumId;
@@ -74,6 +76,28 @@ export const STADIUMS: StadiumMeta[] = [
     image: STADIUM_IMAGES.rabatStadium,
     status: "Ready",
     statusAr: "جاهز",
+  },
+  {
+    id: "stade-de-fes",
+    name: "Stade de Fès",
+    nameAr: "ملعب فاس",
+    city: "Fès",
+    cityAr: "فاس",
+    capacity: 40000,
+    image: STADIUM_IMAGES.stadiumConstruction,
+    status: "Under Construction",
+    statusAr: "قيد الإنشاء",
+  },
+  {
+    id: "stade-adrar-agadir",
+    name: "Stade Adrar",
+    nameAr: "ملعب أدرار",
+    city: "Agadir",
+    cityAr: "أكادير",
+    capacity: 45000,
+    image: STADIUM_IMAGES.grandStadeMarrakesh,
+    status: "Under Construction",
+    statusAr: "قيد الإنشاء",
   },
 ];
 

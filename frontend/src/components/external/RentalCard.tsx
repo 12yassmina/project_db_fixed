@@ -79,7 +79,7 @@ export const RentalCard: React.FC<RentalCardProps> = ({
       {/* Rental Images */}
       <div className="relative h-48 overflow-hidden">
         <img
-          src={rental.images?.[0] || `${(import.meta.env.VITE_API_BASE as string) || 'http://localhost:5001/api'}/images/rental`}
+          src={rental.mainImage || rental.images?.[0]?.url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'}
           alt={rental.title}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
         />

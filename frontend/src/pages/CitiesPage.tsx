@@ -8,6 +8,8 @@ import casablancaImage from "@/assets/cities/casablanca-real.jpeg";
 import marrakechImage from "@/assets/cities/marrakech-real.jpg";
 import rabatImage from "@/assets/cities/rabat-real.jpg";
 import tangierImage from "@/assets/cities/tangier-real.jpg";
+import fesImage from "@/assets/cities/citie fes.jpg";
+import agadirImage from "@/assets/cities/citie-Agadir.jpg";
 
 const CitiesPage = () => {
   const cities = [
@@ -38,6 +40,20 @@ const CitiesPage = () => {
       description: "Gateway between Africa and Europe",
       population: "1.1 million",
       attractions: ["Cap Spartel", "Hercules Caves", "Kasbah Museum", "Grand Socco"]
+    },
+    { 
+      name: "Fès", 
+      image: fesImage, 
+      description: "Morocco's spiritual capital and cultural heart",
+      population: "1.2 million",
+      attractions: ["Al-Qarawiyyin University", "Bou Inania Madrasa", "Chouara Tannery", "Royal Palace"]
+    },
+    { 
+      name: "Agadir", 
+      image: agadirImage, 
+      description: "Morocco's premier beach destination and resort city",
+      population: "900,000",
+      attractions: ["Agadir Beach", "Souk El Had", "Agadir Marina", "Kasbah Ruins"]
     }
   ];
 

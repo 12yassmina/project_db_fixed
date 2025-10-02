@@ -5,6 +5,7 @@ import type { MapOptions } from 'leaflet';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { 
   Hotel, 
   Utensils, 
@@ -14,7 +15,8 @@ import {
   Car,
   Star,
   Phone,
-  Clock
+  Clock,
+  Search
 } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
@@ -29,6 +31,12 @@ interface MapLocation {
   phone?: string;
   hours?: string;
   image?: string;
+}
+
+interface MapComponentProps {
+  searchQuery?: string;
+  selectedCity?: string;
+  selectedFilter?: string;
 }
 
 function fixMarkerIcon() {
@@ -58,9 +66,17 @@ const createCustomIcon = (type: string, color: string) => {
   });
 };
 
-export default function MapComponent() {
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+export default function MapComponent({ 
+  searchQuery: externalSearchQuery = '', 
+  selectedCity: externalSelectedCity = 'all', 
+  selectedFilter: externalSelectedFilter = 'all' 
+}: MapComponentProps) {
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
+  
+  // Use external props for filtering
+  const searchQuery = externalSearchQuery;
+  const selectedCity = externalSelectedCity;
+  const selectedFilter = externalSelectedFilter;
 
   useEffect(() => {
     fixMarkerIcon();
@@ -168,9 +184,23 @@ export default function MapComponent() {
     }
   ];
 
-  const filteredLocations = selectedFilter === 'all' 
-    ? locations 
-    : locations.filter(loc => loc.type === selectedFilter);
+
+  const filteredLocations = locations.filter(location => {
+    // Filter by type
+    const typeMatch = selectedFilter === 'all' || location.type === selectedFilter;
+    
+    // Filter by search query
+    const searchMatch = !searchQuery || 
+      location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      location.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filter by city (basic implementation - you may need to enhance this)
+    const cityMatch = selectedCity === 'all' || 
+      location.name.toLowerCase().includes(selectedCity.toLowerCase()) ||
+      location.description.toLowerCase().includes(selectedCity.toLowerCase());
+    
+    return typeMatch && searchMatch && cityMatch;
+  });
 
   const options: MapOptions = {
     center: [32.2540, -6.0370], // Centre du Maroc
@@ -208,26 +238,9 @@ export default function MapComponent() {
     window.open(`tel:${phone}`, '_self');
   };
   
+
   return (
     <div className="relative w-full h-full">
-      {/* Filtres */}
-      <div className="absolute top-4 left-4 z-[1000] bg-white rounded-lg shadow-lg p-4">
-        <h3 className="font-semibold mb-3 text-sm">Filtrer par type</h3>
-        <div className="flex flex-wrap gap-2">
-          {filterButtons.map((filter) => (
-            <Button
-              key={filter.key}
-              variant={selectedFilter === filter.key ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedFilter(filter.key)}
-              className="flex items-center gap-1"
-            >
-              <filter.icon className="w-3 h-3" />
-              {filter.label}
-            </Button>
-          ))}
-        </div>
-      </div>
 
       {/* Détails du lieu sélectionné */}
       {selectedLocation && (

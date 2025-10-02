@@ -9,6 +9,8 @@ import casablancaImage from "@/assets/cities/casablanca-real.jpeg";
 import marrakechImage from "@/assets/cities/marrakech-real.jpg";
 import rabatImage from "@/assets/cities/rabat-real.jpg";
 import tangierImage from "@/assets/cities/tangier-real.jpg";
+import fesImage from "@/assets/cities/citie fes.jpg";
+import agadirImage from "@/assets/cities/citie-Agadir.jpg";
 
 const CityPage = () => {
   const { cityName } = useParams<{ cityName: string }>();
@@ -19,7 +21,9 @@ const CityPage = () => {
       'casablanca': 'new-stadium-casablanca',
       'marrakech': 'grand-stade-marrakesh', 
       'rabat': 'grand-stade-rabat',
-      'tangier': 'grand-stade-tanger'
+      'tangier': 'grand-stade-tanger',
+      'fès': 'stade-de-fes',
+      'agadir': 'stade-adrar-agadir'
     };
     return stadiumMap[city?.toLowerCase() || ''] || '';
   };
@@ -320,6 +324,154 @@ const CityPage = () => {
         "Restaurant Riad Tanja - Traditional atmosphere",
         "Cafe Hafa - Historic cliff-top cafe"
       ]
+    },
+    fès: {
+      name: "Fès",
+      nickname: "The Spiritual Capital",
+      vibe: "heritage, learning, and stadium glory",
+      description: "Morocco's spiritual and intellectual capital, home to the world's oldest university and a UNESCO World Heritage medina filled with ancient crafts and traditions.",
+      greeting: {
+        darija: "Marhba bik f Fas",
+        tamazight: "ⴰⵣⵓⵍ ⴰⵏⴰⵎⵎⴰⵍⵉⵏ ⴳ ⴼⴰⵙ",
+        translation: "Welcome to Fès"
+      },
+      image: fesImage,
+      history: "Founded in 789 AD by Idris I, Fès became the spiritual and intellectual heart of Morocco. The city flourished under various dynasties, becoming a major center of Islamic learning and craftsmanship. The University of Al-Qarawiyyin, founded in 859 AD, is recognized as the world's oldest continuously operating university. Today, Fès preserves its medieval character while preparing to welcome World Cup 2030 visitors to experience authentic Moroccan culture.",
+      culturalIdentity: "Fès embodies Morocco's intellectual and spiritual heritage - a living museum where ancient traditions thrive. The city is renowned for its master craftsmen, Islamic scholars, and the magnificent Al-Qarawiyyin University. From the labyrinthine medina to the famous tanneries, Fès offers visitors an authentic journey through Morocco's golden age of learning and artisanship.",
+      neighborhoods: [
+        { name: "Fès el-Bali", description: "UNESCO World Heritage old medina with Al-Qarawiyyin University and traditional crafts" },
+        { name: "Fès el-Jdid", description: "Medieval new city with royal palace and Jewish quarter (Mellah)" },
+        { name: "Ville Nouvelle", description: "Modern French-built district with wide boulevards and contemporary amenities" }
+      ],
+      gallery: [
+        { url: "https://images.unsplash.com/photo-1539650116574-75c0c6d73c6e?w=400&h=400&fit=crop", caption: "Al-Qarawiyyin University" },
+        { url: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=400&fit=crop", caption: "Traditional Tanneries" },
+        { url: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=400&fit=crop", caption: "Medina Architecture" }
+      ],
+      stadium: {
+        name: "Stade de Fès",
+        capacity: "40,000",
+        status: "Under Construction",
+        features: ["Traditional Architecture", "Cultural Heritage Center", "Artisan Workshops", "Islamic Art Gallery"]
+      },
+      attractions: [
+        {
+          title: "Al-Qarawiyyin University & Mosque",
+          description: "World's oldest continuously operating university (859 AD) - center of Islamic learning",
+          image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73c6e?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Chouara Tanneries",
+          description: "Ancient leather tanneries with traditional dyeing methods - iconic Fès experience",
+          image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Bou Inania Madrasa",
+          description: "14th-century Islamic school with stunning architecture and intricate decorations",
+          image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Fès el-Bali Medina",
+          description: "UNESCO World Heritage medieval city - world's largest car-free urban area",
+          image: "https://images.unsplash.com/photo-1517821362941-f7f753200fef?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Dar Batha Museum",
+          description: "19th-century palace showcasing traditional Moroccan arts and crafts",
+          image: "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Mellah (Jewish Quarter)",
+          description: "Historic Jewish quarter with synagogues and traditional architecture",
+          image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop"
+        }
+      ],
+      hotels: [
+        "Riad Fès - Luxury traditional riad",
+        "Palais Faraj Suites & Spa - Historic palace hotel",
+        "Hotel Sahrai - Modern luxury with medina views",
+        "Riad Maison Bleue - Boutique heritage hotel"
+      ],
+      restaurants: [
+        "Dar Roumana - Refined Moroccan cuisine",
+        "The Ruined Garden - Garden restaurant in medina",
+        "Palais de Fès - Traditional palace dining",
+        "Restaurant Numero 7 - Contemporary Moroccan"
+      ]
+    },
+    agadir: {
+      name: "Agadir",
+      nickname: "The Beach City",
+      vibe: "sun, surf, and stadium excitement",
+      description: "Morocco's premier beach destination on the Atlantic coast, known for its modern resort atmosphere, golden beaches, and year-round sunshine.",
+      greeting: {
+        darija: "Marhba bik f Agadir",
+        tamazight: "ⴰⵣⵓⵍ ⴰⵏⴰⵎⵎⴰⵍⵉⵏ ⴳ ⴰⴳⴰⴷⵉⵔ",
+        translation: "Welcome to Agadir"
+      },
+      image: agadirImage,
+      history: "Originally a Berber settlement, Agadir became an important trading port in the 16th century. The city was devastated by an earthquake in 1960 but was completely rebuilt as a modern resort destination. Today, Agadir is Morocco's leading beach resort, combining traditional Berber culture with contemporary tourism infrastructure. As a World Cup 2030 host city, it offers visitors the unique combination of football excitement and Atlantic coast relaxation.",
+      culturalIdentity: "Agadir represents modern Morocco's tourism success - a vibrant coastal city where Berber traditions meet international resort culture. Known for its laid-back atmosphere, beautiful beaches, and outdoor activities, Agadir offers a different side of Morocco. The city balances its role as a beach destination with authentic Berber heritage, traditional souks, and proximity to the Atlas Mountains.",
+      neighborhoods: [
+        { name: "Beach Front", description: "Modern resort area with hotels, restaurants, and beach activities" },
+        { name: "Souk El Had", description: "Traditional market area with authentic Berber crafts and local products" },
+        { name: "Agadir Oufella", description: "Historic hilltop ruins with panoramic views of the city and ocean" }
+      ],
+      gallery: [
+        { url: "https://images.unsplash.com/photo-1539650116574-75c0c6d73c6e?w=400&h=400&fit=crop", caption: "Agadir Beach" },
+        { url: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=400&fit=crop", caption: "Marina and Port" },
+        { url: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=400&fit=crop", caption: "Atlas Mountains View" }
+      ],
+      stadium: {
+        name: "Stade Adrar Agadir",
+        capacity: "45,000",
+        status: "Under Construction",
+        features: ["Ocean View", "Retractable Roof", "Beach Club", "Surf Training Center"]
+      },
+      attractions: [
+        {
+          title: "Agadir Beach",
+          description: "10km of golden sand beach - Morocco's premier Atlantic coast destination",
+          image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73c6e?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Agadir Oufella Ruins",
+          description: "Historic hilltop kasbah ruins with panoramic views of city and ocean",
+          image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Souk El Had",
+          description: "Traditional Berber market - one of Morocco's largest souks with local crafts",
+          image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Agadir Marina",
+          description: "Modern marina with restaurants, cafes, and boat excursions",
+          image: "https://images.unsplash.com/photo-1517821362941-f7f753200fef?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Paradise Valley",
+          description: "Natural oasis in Atlas Mountains - palm trees, natural pools, and hiking",
+          image: "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=400&h=300&fit=crop"
+        },
+        {
+          title: "Taghazout Beach",
+          description: "World-class surfing destination 20km north of Agadir",
+          image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop"
+        }
+      ],
+      hotels: [
+        "Sofitel Agadir Thalassa Sea & Spa - Luxury beachfront",
+        "Hyatt Place Taghazout Bay - Modern surf resort",
+        "Royal Atlas & Spa - Traditional Moroccan luxury",
+        "Iberostar Founty Beach - All-inclusive resort"
+      ],
+      restaurants: [
+        "Pure Passion Restaurant - Beachfront fine dining",
+        "Jour et Nuit - Traditional Moroccan cuisine",
+        "La Scala - Italian cuisine with ocean view",
+        "Tafarnout - Berber specialties and tagines"
+      ]
     }
   };
 
@@ -353,10 +505,10 @@ const CityPage = () => {
           
           <div className="container mx-auto px-4 relative z-10">
             <div className="flex items-center mb-6">
-              <Link to="/">
+              <Link to="/cities">
                 <Button variant="ghost" size="sm">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Home
+                  Back to Cities
                 </Button>
               </Link>
             </div>
@@ -602,7 +754,7 @@ const CityPage = () => {
                         </div>
                         <div className="flex justify-between items-center p-3 bg-white/15 rounded-xl">
                           <span className="font-medium text-lg">Please:</span>
-                          <span className="bg-white/25 px-4 py-2 rounded-full font-semibold">Min fadlik من فضلك</span>
+                          <span className="bg-white/25 px-4 py-2 rounded-full font-semibold">Afak ن فضلك</span>
                         </div>
                         <div className="flex justify-between items-center p-3 bg-white/15 rounded-xl">
                           <span className="font-medium text-lg">Excuse me:</span>
@@ -621,7 +773,7 @@ const CityPage = () => {
                       <div className="space-y-4">
                         <div className="flex justify-between items-center p-3 bg-white/15 rounded-xl">
                           <span className="font-medium text-lg">How much?:</span>
-                          <span className="bg-white/25 px-4 py-2 rounded-full font-semibold">Bekam? بكام؟</span>
+                          <span className="bg-white/25 px-4 py-2 rounded-full font-semibold">Bechhal? بشحال؟</span>
                         </div>
                         <div className="flex justify-between items-center p-3 bg-white/15 rounded-xl">
                           <span className="font-medium text-lg">Where is?:</span>
@@ -687,20 +839,6 @@ const CityPage = () => {
                   </div>
                 ))}
               </div>
-
-              {/* Social Media Integration */}
-              <Card className="p-6 text-center bg-gradient-card">
-                <h3 className="text-xl font-semibold text-foreground mb-4">Share Your Experience</h3>
-                <p className="text-muted-foreground mb-4">Tag your photos with #{city.name.toLowerCase()}2030</p>
-                <div className="flex justify-center gap-4">
-                  <Button variant="outline" className="border-blue-500 text-blue-600">
-                    📱 Instagram
-                  </Button>
-                  <Button variant="outline" className="border-green-500 text-green-600">
-                    📤 Share
-                  </Button>
-                </div>
-              </Card>
             </div>
           </div>
         </section>
@@ -714,3 +852,8 @@ const CityPage = () => {
 };
 
 export default CityPage;
+
+
+
+
+

@@ -1,141 +1,115 @@
 const express = require('express');
 const router = express.Router();
 const { optionalAuth } = require('../middleware/auth');
-
-// Mock restaurant data for development
-const mockRestaurants = [
-  {
-    id: 1,
-    name: 'La Maison Arabe',
-    city: 'Marrakech',
-    cuisine: 'Moroccan',
-    rating: 4.7,
-    priceRange: '$$$',
-    image: '/api/images/restaurant',
-    halal: true,
-    worldCupSpecial: true
-  },
-  {
-    id: 2,
-    name: 'Rick\'s Café',
-    city: 'Casablanca',
-    cuisine: 'International',
-    rating: 4.4,
-    priceRange: '$$$$',
-    image: '/api/images/restaurant',
-    halal: false,
-    worldCupSpecial: true
-  },
-  {
-    id: 3,
-    name: 'Dar Hatim',
-    city: 'Fez',
-    cuisine: 'Traditional',
-    rating: 4.6,
-    priceRange: '$$$',
-    image: '/api/images/restaurant',
-    halal: true,
-    worldCupSpecial: false
-  },
-  {
-    id: 4,
-    name: 'Le Dhow',
-    city: 'Rabat',
-    cuisine: 'Seafood',
-    rating: 4.5,
-    priceRange: '$$$',
-    image: '/api/images/restaurant',
-    halal: false,
-    worldCupSpecial: true
-  }
-];
+const Restaurant = require('../models/Restaurant');
 // @route   GET /api/restaurants
 // @desc    Get all restaurants
 // @access  Public
-router.get('/', optionalAuth, (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
-    const { city, cuisine, rating, priceRange } = req.query;
+    const { city, cuisine, rating, priceRange, featured } = req.query;
     
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-
-    // Enhanced mock restaurants with proper images
-    const enhancedMockRestaurants = mockRestaurants.map(restaurant => ({
-      ...restaurant,
-      images: [
-        `${baseUrl}/api/images/restaurant`,
-        `${baseUrl}/api/images/restaurant/large`
-      ],
-      cuisine: [restaurant.cuisine || 'moroccan'],
-      coordinates: { latitude: 31.6295, longitude: -7.9811 },
-      contact: {
-        phone: '+212 524 387 010',
-        website: 'https://restaurant.ma',
-        email: 'info@restaurant.ma'
-      },
-      reviewCount: Math.floor(Math.random() * 500) + 50,
-      priceLevel: 3,
-      hours: {
-        monday: '12:00-23:00',
-        tuesday: '12:00-23:00',
-        wednesday: '12:00-23:00',
-        thursday: '12:00-23:00',
-        friday: '12:00-23:00',
-        saturday: '12:00-23:00',
-        sunday: '12:00-23:00'
-      },
-      features: {
-        delivery: false,
-        takeout: true,
-        reservations: true,
-        outdoor_seating: true,
-        wifi: true,
-        parking: true,
-        wheelchair_accessible: false,
-        halal: restaurant.halal || false,
-        worldCupViewing: true
-      },
-      worldCupFeatures: {
-        stadiumDistance: Math.random() * 15,
-        matchViewing: Math.random() > 0.5,
-        worldCupMenu: true,
-        groupBookings: true,
-        fanZone: Math.random() > 0.7
-      }
-    }));
-    
-    let filteredRestaurants = [...enhancedMockRestaurants];
+    // Build query
+    let query = { isOpen: true };
     
     if (city) {
-      const cityFiltered = filteredRestaurants.filter(restaurant => 
-        restaurant.city.toLowerCase().includes(city.toLowerCase())
-      );
-      filteredRestaurants = cityFiltered.length > 0 ? cityFiltered : enhancedMockRestaurants;
+      query.city = new RegExp(city, 'i');
     }
     
     if (cuisine) {
-      filteredRestaurants = filteredRestaurants.filter(restaurant => 
-        restaurant.cuisine.some(c => c.toLowerCase().includes(cuisine.toLowerCase()))
-      );
+      query.cuisine = { $in: [new RegExp(cuisine, 'i')] };
     }
     
     if (rating) {
-      filteredRestaurants = filteredRestaurants.filter(restaurant => 
-        restaurant.rating >= parseFloat(rating)
-      );
+      query.rating = { $gte: parseFloat(rating) };
     }
     
-    console.log('🍽️ Backend API: Returning restaurants with images:', filteredRestaurants.length);
+    if (priceRange) {
+      query.priceRange = priceRange;
+    }
+    
+    if (featured === 'true') {
+      query.featured = true;
+    }
+    
+    // Execute query with sorting
+    const restaurants = await Restaurant.find(query)
+      .sort({ featured: -1, rating: -1 })
+      .limit(50);
+    
+    // Transform data to match frontend expectations
+    const transformedRestaurants = restaurants.map(restaurant => {
+      const restaurantObj = restaurant.toObject();
+      
+      // Transform openingHours to hours format expected by frontend
+      if (restaurantObj.openingHours) {
+        restaurantObj.hours = {};
+        Object.keys(restaurantObj.openingHours).forEach(day => {
+          const dayHours = restaurantObj.openingHours[day];
+          if (dayHours.closed) {
+            restaurantObj.hours[day] = 'Closed';
+          } else {
+            restaurantObj.hours[day] = `${dayHours.open}-${dayHours.close}`;
+          }
+        });
+      }
+      
+      // Ensure id field exists (some components expect id instead of _id)
+      restaurantObj.id = restaurantObj._id.toString();
+      
+      return restaurantObj;
+    });
+    
+    console.log('🍽️ Backend API: Returning restaurants from database:', transformedRestaurants.length);
     
     res.json({
       success: true,
-      data: filteredRestaurants,
+      data: transformedRestaurants,
       status: 200
     });
   } catch (error) {
     console.error('Get restaurants error:', error);
     res.status(500).json({
       success: false,
+      message: 'Server error while fetching restaurants'
     });
+  }
+});
+
+// @route   GET /api/restaurants/:id
+// @desc    Get restaurant details
+// @access  Public
+router.get('/:id', optionalAuth, async (req, res) => {
+  try {
+    const restaurant = await Restaurant.findById(req.params.id);
+
+    if (!restaurant) {
+      return res.status(404).json({ success: false, message: 'Restaurant not found' });
+    }
+
+    // Transform data to match frontend expectations
+    const restaurantObj = restaurant.toObject();
+    
+    // Transform openingHours to hours format expected by frontend
+    if (restaurantObj.openingHours) {
+      restaurantObj.hours = {};
+      Object.keys(restaurantObj.openingHours).forEach(day => {
+        const dayHours = restaurantObj.openingHours[day];
+        if (dayHours.closed) {
+          restaurantObj.hours[day] = 'Closed';
+        } else {
+          restaurantObj.hours[day] = `${dayHours.open}-${dayHours.close}`;
+        }
+      });
+    }
+    
+    // Ensure id field exists
+    restaurantObj.id = restaurantObj._id.toString();
+
+    res.json({ success: true, data: restaurantObj, status: 200 });
+  } catch (error) {
+    console.error('Get restaurant details error:', error);
+    res.status(500).json({ success: false, message: 'Server error while fetching restaurant details' });
   }
 });
 

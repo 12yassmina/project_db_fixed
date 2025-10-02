@@ -63,7 +63,6 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/hotels', require('./routes/hotelRoutes'));
 app.use('/api/restaurants', require('./routes/restaurantRoutes'));
 app.use('/api/rentals', require('./routes/rentalRoutes'));
-app.use('/api/car-rentals', require('./routes/carRentalRoutes'));
 app.use('/api/events', require('./routes/eventsRoutes'));
 app.use('/api', require('./routes/imageRoutes'));
 
@@ -97,7 +96,7 @@ app.get('/api', (req, res) => {
       services: {
         hotels: 'GET /api/hotels',
         restaurants: 'GET /api/restaurants',
-        carRentals: 'GET /api/car-rentals'
+        rentals: 'GET /api/rentals'
       }
     }
   });

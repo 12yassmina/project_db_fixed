@@ -109,12 +109,12 @@ const ExternalServicesPage: React.FC = () => {
   const restaurantsQuery = useRestaurantSearch(searchParams, activeTab === 'restaurants');
 
   const worldCupCities = [
-    { value: 'casablanca', label: 'Casablanca' },
-    { value: 'rabat', label: 'Rabat' },
-    { value: 'marrakech', label: 'Marrakech' },
-    { value: 'tangier', label: 'Tangier' },
-    { value: 'agadir', label: 'Agadir' },
-    { value: 'fez', label: 'Fez' }
+    { value: 'Casablanca', label: 'Casablanca' },
+    { value: 'Rabat', label: 'Rabat' },
+    { value: 'Marrakech', label: 'Marrakech' },
+    { value: 'Tangier', label: 'Tangier' },
+    { value: 'Agadir', label: 'Agadir' },
+    { value: 'Fez', label: 'Fez' }
   ];
 
   const currentQuery = () => {
@@ -157,7 +157,7 @@ const ExternalServicesPage: React.FC = () => {
                       City
                     </Label>
                     <Select
-                      value={searchParams.location.city?.toLowerCase()}
+                      value={searchParams.location.city}
                       onValueChange={(cityName) => updateSearchParams({ location: { ...searchParams.location, city: cityName } })}
                     >
                       <SelectTrigger>

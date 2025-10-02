@@ -1,0 +1,3 @@
+import tangierImage from "@/assets/cities/tangier-real.jpg";
+import fesImage from "@/assets/cities/citie fes.jpg";
+import agadirImage from "@/assets/cities/citie-Agadir.jpg";

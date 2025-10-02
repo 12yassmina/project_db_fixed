@@ -86,7 +86,7 @@ export const RestaurantCard: React.FC<RestaurantCardProps> = ({
       {/* Restaurant Image */}
       <div className="relative h-48 overflow-hidden">
         <img
-          src={restaurant.images[0] || 'http://localhost:5000/api/images/restaurant'}
+          src={restaurant.mainImage || restaurant.images?.[0]?.url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800'}
           alt={restaurant.name}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
         />

@@ -69,11 +69,11 @@ const StadiumsPage = () => {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">4</div>
+                <div className="text-3xl font-bold text-primary mb-2">6</div>
                 <div className="text-sm text-muted-foreground">Host Stadiums</div>
               </div>
               <div className="text-center">
-        <div className="text-3xl font-bold text-primary mb-2">357K</div>
+        <div className="text-3xl font-bold text-primary mb-2">442K</div>
         <div className="text-sm text-muted-foreground">Total Capacity</div>
               </div>
               <div className="text-center">

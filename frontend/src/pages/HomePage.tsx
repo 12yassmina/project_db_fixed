@@ -19,7 +19,9 @@ import {
 import casablancaImage from "@/assets/casablanca-city.jpg";
 import marrakechImage from "@/assets/marrakech-city .jpg";
 import rabatImage from "@/assets/rabat-city.jpg";
-import tangierImage from "@/assets/tangier-city.jpg";
+import tangierImage from "@/assets/cities/tangier-real.jpg";
+import fesImage from "@/assets/cities/citie fes.jpg";
+import agadirImage from "@/assets/cities/citie-Agadir.jpg";
 
 const HomePage = () => {
   const featuredSections = [
@@ -84,6 +86,18 @@ const HomePage = () => {
       description: "Gateway to Africa with stunning Mediterranean views",
       image: tangierImage,
       stadium: "Tangier Stadium - 65,000 capacity"
+    },
+    {
+      name: "Fès",
+      description: "Morocco's spiritual capital and cultural heart",
+      image: fesImage,
+      stadium: "Stade de Fès - 40,000 capacity"
+    },
+    {
+      name: "Agadir",
+      description: "Morocco's premier beach destination",
+      image: agadirImage,
+      stadium: "Stade Adrar - 45,000 capacity"
     }
   ];
 

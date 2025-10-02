@@ -9,14 +9,26 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { fetchSuggestions } from '@/lib/api';
 
+// Team Logos for World Cup 2030
+const teamLogos = {
+  morocco: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg",
+  spain: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg",
+  brazil: "https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg",
+  germany: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Flag_of_Germany.svg",
+  argentina: "https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg",
+  france: "https://upload.wikimedia.org/wikipedia/commons/c/c3/Flag_of_France.svg",
+  england: "https://upload.wikimedia.org/wikipedia/commons/b/be/Flag_of_England.svg",
+  italy: "https://upload.wikimedia.org/wikipedia/commons/0/03/Flag_of_Italy.svg"
+};
+
 const SchedulePage = () => {
   const groupStageMatches = [
     {
       id: 1,
       date: "2030-06-15",
       time: "18:00",
-      teamA: "Morocco",
-      teamB: "Spain",
+      teamA: { name: "Morocco", logo: teamLogos.morocco, code: "MAR" },
+      teamB: { name: "Spain", logo: teamLogos.spain, code: "ESP" },
       stadium: "Grand Stadium Casablanca",
       city: "Casablanca",
       group: "Group A",
@@ -26,8 +38,8 @@ const SchedulePage = () => {
       id: 2,
       date: "2030-06-16",
       time: "15:00",
-      teamA: "Brazil",
-      teamB: "Germany",
+      teamA: { name: "Brazil", logo: teamLogos.brazil, code: "BRA" },
+      teamB: { name: "Germany", logo: teamLogos.germany, code: "GER" },
       stadium: "Tangier International Stadium",
       city: "Tangier",
       group: "Group B",
@@ -37,8 +49,8 @@ const SchedulePage = () => {
       id: 3,
       date: "2030-06-17",
       time: "21:00",
-      teamA: "Argentina",
-      teamB: "France",
+      teamA: { name: "Argentina", logo: teamLogos.argentina, code: "ARG" },
+      teamB: { name: "France", logo: teamLogos.france, code: "FRA" },
       stadium: "Rabat National Stadium",
       city: "Rabat",
       group: "Group C",
@@ -48,8 +60,8 @@ const SchedulePage = () => {
       id: 4,
       date: "2030-06-18",
       time: "18:00",
-      teamA: "England",
-      teamB: "Italy",
+      teamA: { name: "England", logo: teamLogos.england, code: "ENG" },
+      teamB: { name: "Italy", logo: teamLogos.italy, code: "ITA" },
       stadium: "Marrakech Red City Stadium",
       city: "Marrakech",
       group: "Group D",
@@ -157,12 +169,36 @@ const SchedulePage = () => {
         </div>
 
         <div className="flex items-center justify-center space-x-8">
-          <div className="text-center">
-            <div className="text-lg font-semibold text-foreground">{match.teamA}</div>
+          <div className="flex flex-col items-center space-y-2">
+            {match.teamA.logo && (
+              <img 
+                src={match.teamA.logo} 
+                alt={match.teamA.name}
+                className="w-12 h-8 object-contain"
+              />
+            )}
+            <div className="text-center">
+              <div className="text-lg font-semibold text-foreground">{match.teamA.name || match.teamA}</div>
+              {match.teamA.code && (
+                <div className="text-xs text-muted-foreground">{match.teamA.code}</div>
+              )}
+            </div>
           </div>
           <div className="text-2xl font-bold text-muted-foreground">VS</div>
-          <div className="text-center">
-            <div className="text-lg font-semibold text-foreground">{match.teamB}</div>
+          <div className="flex flex-col items-center space-y-2">
+            {match.teamB.logo && (
+              <img 
+                src={match.teamB.logo} 
+                alt={match.teamB.name}
+                className="w-12 h-8 object-contain"
+              />
+            )}
+            <div className="text-center">
+              <div className="text-lg font-semibold text-foreground">{match.teamB.name || match.teamB}</div>
+              {match.teamB.code && (
+                <div className="text-xs text-muted-foreground">{match.teamB.code}</div>
+              )}
+            </div>
           </div>
         </div>
 

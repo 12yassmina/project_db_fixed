@@ -1,4 +1,4 @@
-import { BaseApiService, ApiResponse } from './apiService';
+import { ApiService, ApiResponse } from './apiService';
 
 // Location interface
 export interface Location {
@@ -8,58 +8,81 @@ export interface Location {
 }
 
 export interface Restaurant {
+  _id?: string;
   id: string;
   name: string;
-  address: string;
+  description: string;
+  cuisine: string[];
   city: string;
-  country: string;
+  address: string;
   coordinates: {
     latitude: number;
     longitude: number;
   };
-  images: string[];
-  cuisine: string[];
   rating: number;
   reviewCount: number;
-  priceLevel: number;
+  priceRange: string;
+  averagePrice: number;
+  currency: string;
+  mainImage: string;
+  images: { url: string; alt: string }[];
+  menu: {
+    category: string;
+    items: {
+      name: string;
+      description: string;
+      price: number;
+      isVegetarian: boolean;
+      isVegan: boolean;
+      isGlutenFree: boolean;
+      spiceLevel?: string;
+    }[];
+  }[];
+  features: string[];
+  openingHours: {
+    monday: { open: string; close: string; closed: boolean };
+    tuesday: { open: string; close: string; closed: boolean };
+    wednesday: { open: string; close: string; closed: boolean };
+    thursday: { open: string; close: string; closed: boolean };
+    friday: { open: string; close: string; closed: boolean };
+    saturday: { open: string; close: string; closed: boolean };
+    sunday: { open: string; close: string; closed: boolean };
+  };
   contact: {
-    phone?: string;
-    website?: string;
-    email?: string;
+    phone: string;
+    email: string;
+    website: string;
   };
-  hours: {
-    monday: string;
-    tuesday: string;
-    wednesday: string;
-    thursday: string;
-    friday: string;
-    saturday: string;
-    sunday: string;
-  };
-  features: {
-    delivery: boolean;
-    takeout: boolean;
-    reservations: boolean;
-    outdoor_seating: boolean;
-    wifi: boolean;
-    parking: boolean;
-    wheelchair_accessible: boolean;
-    halal: boolean;
-    worldCupViewing: boolean;
+  reservations: {
+    required: boolean;
+    online: boolean;
+    phone: boolean;
   };
   worldCupFeatures: {
-    stadiumDistance: number;
-    matchViewing: boolean;
-    worldCupMenu: boolean;
+    matchScreening: boolean;
+    fanMenu: boolean;
     groupBookings: boolean;
-    fanZone: boolean;
+    multilingualMenu: boolean;
   };
+  dietaryOptions: {
+    vegetarian: boolean;
+    vegan: boolean;
+    glutenFree: boolean;
+    halal: boolean;
+  };
+  atmosphere: string[];
+  featured: boolean;
+  isOpen: boolean;
 }
 
 export interface RestaurantSearchParams {
   location: Location;
-  cuisine?: string[];
-  rating?: number;
+  filters?: {
+    cuisine?: string[];
+    priceRange?: string | { min: number; max: number };
+    rating?: number;
+    worldCupFeatures?: boolean;
+  };
   openNow?: boolean;
   sortBy?: 'rating' | 'distance' | 'price' | 'relevance';
   limit?: number;
@@ -98,70 +121,105 @@ export interface AvailableTimeSlot {
   type: 'standard' | 'bar' | 'outdoor' | 'private';
 }
 
-class RestaurantService extends BaseApiService {
-  private yelpApiKey: string;
-  private googleApiKey: string;
-
+class RestaurantService extends ApiService {
   constructor() {
-    const backendUrl = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
-    
-    super(backendUrl, 'Restaurant Service', {
-      'Content-Type': 'application/json'
-    });
-
-    this.yelpApiKey = 'backend-api';
-    this.googleApiKey = 'backend-api';
-
-    console.log('🍽️ Restaurant Service: Using backend API at', backendUrl);
+    super(import.meta.env.VITE_API_BASE || 'http://localhost:5001');
+    console.log('🍽️ Restaurant Service: Using database at', this.baseUrl);
   }
 
+  /**
+   * Search for restaurants using database
+   */
   async searchRestaurants(params: RestaurantSearchParams): Promise<ApiResponse<Restaurant[]>> {
-    console.log('🍽️ Restaurant Service: Using backend API');
-    
     try {
-      const searchParams = new URLSearchParams({
-        city: params.location.city || '',
-        ...(params.cuisine && { cuisine: params.cuisine.join(',') }),
-        ...(params.rating && { rating: params.rating.toString() })
-      });
-
-      const API_BASE = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:5001/api';
-      const response = await fetch(`${API_BASE}/restaurants?${searchParams}`);
-      const result = await response.json();
+      // Build query parameters
+      const queryParams = new URLSearchParams();
       
-      if (result.success && result.data) {
-        return {
-          success: true,
-          data: result.data,
-          status: 200
-        };
+      if (params.location?.city) {
+        queryParams.append('city', params.location.city);
       }
       
-      throw new Error('Failed to fetch restaurants');
+      if (params.filters?.cuisine && params.filters.cuisine.length > 0) {
+        queryParams.append('cuisine', params.filters.cuisine.join(','));
+      }
+      
+      if (params.filters?.priceRange) {
+        if (typeof params.filters.priceRange === 'string') {
+          queryParams.append('priceRange', params.filters.priceRange);
+        } else {
+          // Convert price range object to string representation
+          const { min, max } = params.filters.priceRange;
+          if (max <= 100) queryParams.append('priceRange', '$');
+          else if (max <= 200) queryParams.append('priceRange', '$$');
+          else if (max <= 400) queryParams.append('priceRange', '$$$');
+          else queryParams.append('priceRange', '$$$$');
+        }
+      }
+      
+      if (params.filters?.rating) {
+        queryParams.append('rating', params.filters.rating.toString());
+      }
+      
+      if (params.filters?.worldCupFeatures) {
+        queryParams.append('featured', 'true');
+      }
+
+      // Make request to backend database
+      const response = await this.request<Restaurant[]>(`/api/restaurants?${queryParams.toString()}`);
+      
+      if (response.success) {
+        return response;
+      }
     } catch (error) {
-      console.error('🍽️ Restaurant Service Error:', error);
-      return { success: false, data: [], status: 500 };
+      console.warn('Database restaurant search failed:', error);
+    }
+
+    // Return empty result if database fails
+    return {
+      success: false,
+      data: [],
+      status: 500,
+      message: 'Failed to fetch restaurants'
+    };
+  }
+
+  /**
+   * Get restaurant details by ID
+   */
+  async getRestaurantDetails(restaurantId: string): Promise<ApiResponse<Restaurant>> {
+    try {
+      const response = await this.request<Restaurant>(`/api/restaurants/${restaurantId}`);
+      return response;
+    } catch (error) {
+      console.error('Get restaurant details error:', error);
+      return {
+        success: false,
+        data: null as any,
+        status: 500,
+        message: 'Failed to fetch restaurant details'
+      };
     }
   }
 
-  async getRestaurantDetails(restaurantId: string): Promise<ApiResponse<Restaurant>> {
-    return { success: false, data: null, status: 404 };
-  }
-
-  async getRestaurantReviews(restaurantId: string): Promise<ApiResponse<any[]>> {
-    return { success: false, data: [], status: 404 };
-  }
-
-  async getAvailableTimeSlots(
-    restaurantId: string,
-    date: string,
-    partySize: number
-  ): Promise<ApiResponse<AvailableTimeSlot[]>> {
-    return { success: false, data: [], status: 404 };
-  }
-
+  /**
+   * Create restaurant reservation
+   */
   async createReservation(reservationRequest: ReservationRequest): Promise<ApiResponse<ReservationConfirmation>> {
-    return { success: false, data: null, status: 404 };
+    try {
+      const response = await this.request<ReservationConfirmation>('/api/restaurants/reservations', {
+        method: 'POST',
+        body: JSON.stringify(reservationRequest)
+      });
+      return response;
+    } catch (error) {
+      console.error('Create restaurant reservation error:', error);
+      return {
+        success: false,
+        data: null as any,
+        status: 500,
+        message: 'Failed to create reservation'
+      };
+    }
   }
 }
 

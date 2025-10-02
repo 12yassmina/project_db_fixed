@@ -11,6 +11,7 @@ import {
   Heart
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import moroccoLogo from "@/assets/logoworld.png";
 
 export const Footer = () => {
   const linkMap: Record<string,string> = {
@@ -48,8 +49,12 @@ export const Footer = () => {
         {/* Logo and Description */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <div className="w-16 h-16 bg-gradient-to-r from-red-600 to-green-600 rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-3xl">⚽</span>
+            <div className="w-16 h-16 rounded-full overflow-hidden">
+              <img 
+                src={moroccoLogo} 
+                alt="Morocco 2030 World Cup Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white">

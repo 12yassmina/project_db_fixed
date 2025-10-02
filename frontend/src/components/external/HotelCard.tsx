@@ -55,13 +55,13 @@ export const HotelCard: React.FC<HotelCardProps> = ({
       {/* Hotel Image */}
       <div className="relative h-48 overflow-hidden">
         <img
-          src={hotel.images[0] || 'http://localhost:5000/api/images/hotel'}
+          src={hotel.mainImage || hotel.images?.[0]?.url || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'}
           alt={hotel.name}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
         />
         
         {/* World Cup Badge */}
-        {showWorldCupFeatures && hotel.worldCupFeatures?.worldCupPackage && (
+        {showWorldCupFeatures && hotel.worldCupFeatures?.matchPackages && (
           <Badge className="absolute top-3 left-3 bg-gradient-morocco text-white">
             <Trophy className="w-3 h-3 mr-1" />
             World Cup Package
@@ -141,22 +141,28 @@ export const HotelCard: React.FC<HotelCardProps> = ({
               <span className="text-sm font-medium text-green-800">World Cup 2030 Features</span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              {hotel.worldCupFeatures.stadiumDistance && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-green-600" />
-                  <span>{hotel.worldCupFeatures.stadiumDistance.toFixed(1)}km to stadium</span>
-                </div>
-              )}
               {hotel.worldCupFeatures.shuttleService && (
                 <div className="flex items-center gap-1">
                   <Car className="w-3 h-3 text-green-600" />
                   <span>Stadium shuttle</span>
                 </div>
               )}
-              {hotel.worldCupFeatures.matchViewingArea && (
+              {hotel.worldCupFeatures.fanZone && (
                 <div className="flex items-center gap-1">
                   <Calendar className="w-3 h-3 text-green-600" />
-                  <span>Match viewing area</span>
+                  <span>Fan zone</span>
+                </div>
+              )}
+              {hotel.worldCupFeatures.matchPackages && (
+                <div className="flex items-center gap-1">
+                  <Trophy className="w-3 h-3 text-green-600" />
+                  <span>Match packages</span>
+                </div>
+              )}
+              {hotel.worldCupFeatures.multilingualStaff && (
+                <div className="flex items-center gap-1">
+                  <Users className="w-3 h-3 text-green-600" />
+                  <span>Multilingual staff</span>
                 </div>
               )}
             </div>
