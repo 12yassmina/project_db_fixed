@@ -21,21 +21,35 @@ app.use(limiter);
 
 // Read allowed origins from .env and split into an array
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:8080', 'http://localhost:8081']; // fallback
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : ['http://localhost:8080', 'http://localhost:8081', 'https://marhba-bik-rose.vercel.app/']; // fallback
+
+console.log('🔒 CORS: Allowed origins:', allowedOrigins);
 
 const corsOptions = {
   origin: function(origin, callback) {
-    // Allow requests with no origin (like Postman)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) === -1) {
-      return callback(new Error('Not allowed by CORS'), false);
+    console.log('🔍 CORS: Request origin:', origin);
+    
+    // Allow requests with no origin (like Postman, mobile apps, server-to-server)
+    if (!origin) {
+      console.log('✅ CORS: Allowing request with no origin');
+      return callback(null, true);
     }
-    return callback(null, true);
+
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
+      console.log('✅ CORS: Origin allowed:', origin);
+      return callback(null, true);
+    }
+    
+    console.log('❌ CORS: Origin not allowed:', origin);
+    console.log('📋 CORS: Allowed origins are:', allowedOrigins);
+    return callback(new Error('Not allowed by CORS'), false);
   },
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
 app.use(cors(corsOptions));
